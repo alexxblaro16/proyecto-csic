@@ -51,11 +51,16 @@ Herramientas por necesidad:
    - `composer install`
 5. Ejecutar migraciones:
    - `docker compose exec app php artisan migrate --force`
-6. Entrar en `desktop/` e instalar dependencias:
+6. - Copiar el .env.example y crear el .env correspondiente (el mismo)
+
+7. Crear la key en el docker:
+    - `docker exec csic_app php artisan key:generate`
+    
+8. Entrar en `desktop/` e instalar dependencias:
    - `npm install`
-7. Arrancar la app de escritorio:
+9. Arrancar la app de escritorio:
    - `npm run electron:dev`
-8. Verificar que la API responde en:
+10. Verificar que la API responde en:
    - `http://localhost:8180/api/health`
 
 ### Comandos de referencia
