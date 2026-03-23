@@ -47,13 +47,15 @@ Herramientas por necesidad:
 2. Abrir la carpeta del proyecto.
 3. Levantar el backend:
    - `docker compose up -d --build`
-4. Ejecutar migraciones:
+4. Ejecutar Dependencia en docker app: 
+   - `composer install`
+5. Ejecutar migraciones:
    - `docker compose exec app php artisan migrate --force`
-5. Entrar en `desktop/` e instalar dependencias:
+6. Entrar en `desktop/` e instalar dependencias:
    - `npm install`
-6. Arrancar la app de escritorio:
+7. Arrancar la app de escritorio:
    - `npm run electron:dev`
-7. Verificar que la API responde en:
+8. Verificar que la API responde en:
    - `http://localhost:8180/api/health`
 
 ### Comandos de referencia
