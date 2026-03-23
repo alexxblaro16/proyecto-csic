@@ -1,3 +1,6 @@
+# Mantener aqui solo a los leads o responsables de review del repositorio.
+# Si cambia el equipo de leads, actualizad este archivo.
+
 # Owner global del repositorio
 * @PRNovoa
 
@@ -10,7 +13,7 @@
 # 3D / 360
 /desktop/src/components/ @PRNovoa @diegomartinezh
 
-# Infraestructura y coordinación
+# Infraestructura y coordinacion
 /docker/ @PRNovoa @Gonsiii11
 /.github/ @PRNovoa
 /docs/ @PRNovoa

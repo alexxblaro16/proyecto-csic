@@ -1,15 +1,15 @@
 # Proyecto CSIC
 
-Base de trabajo para una aplicación de escritorio con `Electron + React + Vite` en el cliente y `Laravel` como API, con entorno backend apoyado en Docker.
+Base de trabajo para una aplicacion de escritorio con `Electron + React + Vite` en el cliente y `Laravel` como API, con entorno backend apoyado en Docker.
 
-Este repositorio está preparado para que varios equipos trabajen en paralelo con el menor número de bloqueos posible: documentación en español, flujo de ramas, plantillas de incidencias y PRs, y comprobaciones automáticas básicas en GitHub Actions.
+Este repositorio esta preparado para que varios equipos trabajen en paralelo con el menor numero de bloqueos posible: documentacion en espanol, flujo de ramas, plantillas de incidencias y PRs, y comprobaciones automaticas basicas en GitHub Actions.
 
 ## Stack del proyecto
 
 - Frontend de escritorio: Electron, React, Vite, Tailwind CSS, Three.js
 - Backend: Laravel 12
 - Infraestructura local: Docker, Nginx, MySQL, Redis
-- Gestión de código: GitHub + GitHub Desktop
+- Gestion de codigo: GitHub + GitHub Desktop
 
 ## Estructura del repositorio
 
@@ -17,11 +17,33 @@ Este repositorio está preparado para que varios equipos trabajen en paralelo co
 .
 |-- backend/            # API Laravel
 |-- desktop/            # App Electron + React + Vite
-|-- docker/             # Dockerfiles y configuración local
-|-- docs/               # Documentación interna del equipo
+|-- docker/             # Dockerfiles y configuracion local
+|-- docs/               # Documentacion interna del equipo
 |-- .github/            # Plantillas, CI y ownership
-`-- docker-compose.yml  # Orquestación local de backend
+`-- docker-compose.yml  # Orquestacion local de backend
 ```
+
+## Modelo de colaboracion en GitHub
+
+Este repositorio esta preparado para trabajar asi:
+
+- El repositorio puede mantenerse `public`.
+- Solo los leads del proyecto se anaden como colaboradores con permisos de escritura.
+- El resto del equipo trabaja desde forks y abre Pull Requests contra este repositorio.
+- `main` debe mantenerse protegida y no recibir pushes directos.
+
+### Reparto de responsabilidades
+
+- Leads
+  - crean ramas en el repositorio principal cuando hace falta
+  - revisan y hacen merge de Pull Requests
+  - pueden empujar cambios a ramas de trabajo no protegidas
+- Resto del equipo
+  - hace fork del repositorio principal
+  - crea ramas en su fork
+  - abre Pull Requests hacia `main` en este repositorio
+
+Si cambia el grupo de leads, actualizad tambien [`.github/CODEOWNERS`](./.github/CODEOWNERS).
 
 ## Requisitos
 
@@ -39,23 +61,21 @@ Herramientas por necesidad:
 - MySQL client si alguien quiere inspeccionar base de datos fuera de Docker
 - Editor con soporte para JS, JSX, PHP, Markdown y YAML
 
-## Puesta en marcha rápida
+## Puesta en marcha rapida
 
-### Primer día
+### Primer dia
 
 1. Clonar el repositorio con GitHub Desktop.
 2. Abrir la carpeta del proyecto.
 3. Levantar el backend:
    - `docker compose up -d --build`
-4. Ejecutar Dependencia en docker app: 
+4. Ejecutar dependencias en docker app:
    - `composer install`
 5. Ejecutar migraciones:
    - `docker compose exec app php artisan migrate --force`
-6. - Copiar el .env.example y crear el .env correspondiente (el mismo)
-
-7. Crear la key en el docker:
-    - `docker exec csic_app php artisan key:generate`
-    
+6. Copiar `backend/.env.example` y crear `backend/.env`.
+7. Crear la key en Docker:
+   - `docker exec csic_app php artisan key:generate`
 8. Entrar en `desktop/` e instalar dependencias:
    - `npm install`
 9. Arrancar la app de escritorio:
@@ -84,19 +104,19 @@ Herramientas por necesidad:
 - Redis: `6179`
 - Vite dev server: `5173`
 
-## Qué hace cada carpeta
+## Que hace cada carpeta
 
 - `backend/`
   - API Laravel
-  - lógica de negocio
+  - logica de negocio
   - acceso a datos
   - tests de backend
 - `desktop/`
   - interfaz React
   - shell Electron
-  - integración Three.js y futuras escenas 3D/360
+  - integracion Three.js y futuras escenas 3D/360
 - `docker/`
-  - configuración de entorno local y backend
+  - configuracion de entorno local y backend
 - `docs/`
   - acuerdos del equipo
   - onboarding
@@ -107,7 +127,7 @@ Herramientas por necesidad:
 
 ### UI/UX
 
-- Definir flujos, arquitectura de información y diseño visual
+- Definir flujos, arquitectura de informacion y diseno visual
 - Mantener criterios de accesibilidad y consistencia
 - Entregar especificaciones a Front End y 3D/360
 
@@ -119,46 +139,48 @@ Herramientas por necesidad:
 
 ### Back End
 
-- Implementar endpoints, modelos, migraciones y lógica de negocio en `backend/`
+- Implementar endpoints, modelos, migraciones y logica de negocio en `backend/`
 - Mantener contratos API estables
-- Añadir y mantener tests de backend
+- Anadir y mantener tests de backend
 
 ### 3D / 360Photo
 
-- Trabajar la integración visual e interactiva en el cliente
-- Mantener escenas, visores, assets y lógica de rendering
+- Trabajar la integracion visual e interactiva en el cliente
+- Mantener escenas, visores, assets y logica de rendering
 - Coordinarse con UI/UX para que la capa 3D encaje en la experiencia
 
 ### QA
 
 - Validar requisitos funcionales
-- Revisar flujos críticos antes de merge a `main`
-- Documentar bugs con pasos de reproducción claros
+- Revisar flujos criticos antes de merge a `main`
+- Documentar bugs con pasos de reproduccion claros
 
 ### Deployment
 
-- Mantener Docker, pipelines y configuración de despliegue
+- Mantener Docker, pipelines y configuracion de despliegue
 - Evolucionar la carpeta `.github/workflows/`
-- Preparar entornos de integración y producción más adelante
+- Preparar entornos de integracion y produccion mas adelante
 
 ## Flujo de trabajo con GitHub Desktop
 
 ### Regla principal
 
 No se trabaja directamente sobre `main`.
+Los leads pueden empujar a ramas de trabajo propias o compartidas, pero la integracion final en `main` debe pasar por Pull Request.
 
 ### Flujo recomendado
 
 1. Actualizar `main` en GitHub Desktop.
-2. Crear una rama nueva desde `main`.
-3. Trabajar solo en esa rama.
-4. Hacer commits pequeños y descriptivos.
-5. Publicar la rama.
-6. Abrir Pull Request.
-7. Esperar revisión y checks automáticos.
-8. Hacer merge cuando esté aprobado.
+2. Si no eres lead, sincronizar primero tu fork con el repositorio principal.
+3. Crear una rama nueva desde `main`.
+4. Trabajar solo en esa rama.
+5. Hacer commits pequenos y descriptivos.
+6. Publicar la rama.
+7. Abrir Pull Request contra este repositorio.
+8. Esperar revision y checks automaticos.
+9. Hacer merge cuando este aprobado.
 
-### Convención de ramas
+### Convencion de ramas
 
 - `feature/frontend-nombre-corto`
 - `feature/backend-nombre-corto`
@@ -167,7 +189,7 @@ No se trabaja directamente sobre `main`.
 - `docs/nombre-corto`
 - `chore/nombre-corto`
 
-## Qué NO subir al repositorio
+## Que NO subir al repositorio
 
 No deben subirse:
 
@@ -179,27 +201,28 @@ No deben subirse:
 - secretos
 - archivos locales de editor o sistema operativo
 
-El repositorio ya incluye reglas para evitar la mayoría de estos casos, pero cada persona debe revisar el panel de cambios antes de hacer commit en GitHub Desktop.
+El repositorio ya incluye reglas para evitar la mayoria de estos casos, pero cada persona debe revisar el panel de cambios antes de hacer commit en GitHub Desktop.
 
-## Validación mínima antes de abrir PR
+## Validacion minima antes de abrir PR
 
 - La app arranca localmente
 - El backend responde
 - `cd desktop && npm run build` funciona
 - `cd backend && php artisan test` funciona
-- La documentación se actualiza si el cambio afecta al flujo del equipo
+- La documentacion se actualiza si el cambio afecta al flujo del equipo
 
-## Documentación adicional
+## Documentacion adicional
 
-- [Guía de contribución](./CONTRIBUTING.md)
+- [Guia de contribucion](./CONTRIBUTING.md)
 - [Arquitectura](./docs/arquitectura.md)
 - [Setup local](./docs/setup-local.md)
 - [Roles y flujo entre equipos](./docs/roles-y-flujo.md)
+- [Configuracion del repositorio en GitHub](./docs/github-repo-setup.md)
 
 ## Roadmap inmediato por equipo
 
 - UI/UX:
-  - cerrar sistema visual, componentes base y estados vacíos
+  - cerrar sistema visual, componentes base y estados vacios
 - Front End:
   - separar la app en carpetas por features y mover la URL de API a variables de entorno
 - Back End:
@@ -207,14 +230,20 @@ El repositorio ya incluye reglas para evitar la mayoría de estos casos, pero ca
 - 3D/360:
   - definir estructura de escenas, assets y rendimiento objetivo
 - QA:
-  - preparar checklist de validación por flujo
+  - preparar checklist de validacion por flujo
 - Deployment:
-  - extender CI y diseñar estrategia de despliegue
+  - extender CI y disenar estrategia de despliegue
 
 ## Recomendaciones extra para reducir problemas
 
-- Activar protección de rama en `main` desde GitHub web
+- Activar proteccion de rama en `main` desde GitHub web
 - Exigir Pull Request para merge
-- Exigir que el workflow de CI esté en verde
-- Configurar reviewers automáticos con `CODEOWNERS`
-- Mantener los cambios pequeños y orientados a un solo objetivo
+- Exigir que el workflow de CI este en verde
+- Configurar reviewers automaticos con `CODEOWNERS`
+- Mantener los cambios pequenos y orientados a un solo objetivo
+- Mantener como colaboradores solo a los leads del proyecto
+- Pedir al resto del equipo que contribuya desde forks
+
+## Configuracion recomendada del repositorio
+
+La parte que se configura en GitHub web esta resumida en [docs/github-repo-setup.md](./docs/github-repo-setup.md).
