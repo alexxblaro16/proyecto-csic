@@ -1,0 +1,71 @@
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: csic_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./backend:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - csic_network
+    depends_on:
+      - mysql
+      - redis
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: csic_nginx
+    restart: unless-stopped
+    ports:
+      - "8180:80"
+    volumes:
+      - ./backend:/var/www
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - csic_network
+    depends_on:
+      - app
+
+  mysql:
+    image: mysql:8.4
+    container_name: csic_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: csic_database
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: csic_user
+      MYSQL_PASSWORD: csic_password
+    ports:
+      - "3106:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - csic_network
+
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: csic_redis
+    restart: unless-stopped
+    ports:
+      - "6179:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - csic_network
+    command: redis-server --appendonly yes
+
+networks:
+  csic_network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local

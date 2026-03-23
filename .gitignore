@@ -1,0 +1,33 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editores
+.idea/
+.vscode/
+
+# Variables sensibles y locales
+.env
+.env.*
+!.env.example
+
+# Artefactos del backend
+backend/.env
+backend/vendor/
+backend/storage/*.key
+backend/storage/pail/
+backend/public/build/
+backend/public/hot
+
+# Artefactos del desktop
+desktop/node_modules/
+desktop/dist/
+desktop/dist-ssr/
+desktop/*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
