@@ -70,7 +70,7 @@ Herramientas por necesidad:
 3. Levantar el backend:
    - `docker compose up -d --build`
 4. Instalar dependencias del backend:
-   - `cd backend && composer install`
+   - `cd backend && composer install && composer require mongodb/laravel-mongodb`
 5. Ejecutar migraciones:
    - `docker compose exec app php artisan migrate --force`
 6. Verificar MongoDB desde Laravel:
