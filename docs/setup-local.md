@@ -19,10 +19,10 @@ Recomendado:
 ## Antes de arrancar
 
 - Docker Desktop debe estar abierto.
-- El backend usa Docker para Nginx, MySQL y Redis.
+- El backend usa Docker para Nginx, MySQL, Redis y MongoDB.
 - Antes de arrancar Laravel, crea `backend/.env` a partir de `backend/.env.example`.
 - Despues de crear `backend/.env`, ejecuta `php artisan key:generate`.
-- Comprueba que los puertos `8180`, `3106`, `6179` y `5173` esten libres.
+- Comprueba que los puertos `8180`, `3106`, `27018`, `6179` y `5173` esten libres.
 - Si PowerShell bloquea `npm`, usa `npm.cmd`.
 
 ## Clonado
@@ -72,6 +72,14 @@ docker compose up -d --build
 docker compose exec app php artisan migrate --force
 ```
 
+### Verificar MongoDB
+
+```bash
+docker compose exec app php artisan mongo:check
+```
+
+Este comando comprueba la conexion `mongodb` de Laravel, hace ping al servidor y ejecuta una escritura y lectura tecnica de prueba.
+
 ### Verificacion rapida
 
 Abre en el navegador:
@@ -118,6 +126,7 @@ npm run build
 - Verifica que Docker Desktop esta arrancado.
 - Ejecuta `docker compose ps`.
 - Revisa `docker compose logs app` y `docker compose logs nginx`.
+- Revisa `docker compose logs mongo` si el problema afecta a MongoDB o MongoDB Compass.
 - Comprueba que existe `backend/.env`.
 - Comprueba que `APP_KEY` se genero con `php artisan key:generate`.
 
@@ -145,9 +154,17 @@ npm.cmd run build
 Si Docker indica que ya existe algun contenedor `csic_*`, elimina los viejos y vuelve a levantar el stack:
 
 ```bash
-docker rm -f csic_app csic_nginx csic_mysql csic_redis
+docker rm -f csic_app csic_nginx csic_mysql csic_mongo csic_redis
 docker compose up -d --build
 ```
+
+### MongoDB Compass no conecta
+
+- Verifica que Docker Desktop esta arrancado.
+- Ejecuta `docker compose ps` y comprueba que `csic_mongo` aparece levantado o healthy.
+- Usa `mongodb://localhost:27018` en MongoDB Compass.
+- Recuerda que `mongo:27017` solo funciona desde otros contenedores en la red de Docker.
+- Si Laravel no conecta, ejecuta `docker compose exec app php artisan mongo:check`.
 
 ### Archivos no deseados en cambios
 

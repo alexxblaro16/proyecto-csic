@@ -13,8 +13,12 @@ services:
     networks:
       - csic_network
     depends_on:
-      - mysql
-      - redis
+      mysql:
+        condition: service_started
+      redis:
+        condition: service_started
+      mongo:
+        condition: service_healthy
 
   nginx:
     image: nginx:1.27-alpine
@@ -47,6 +51,24 @@ services:
     networks:
       - csic_network
 
+  mongo:
+    image: mongo:7
+    container_name: csic_mongo
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_DATABASE: csic_database
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - csic_network
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ ping: 1 })"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   redis:
     image: redis:7.2-alpine
@@ -66,6 +88,8 @@ networks:
 
 volumes:
   mysql_data:
+    driver: local
+  mongo_data:
     driver: local
   redis_data:
     driver: local

@@ -8,7 +8,7 @@ Este repositorio está preparado para que varios equipos trabajen en paralelo co
 
 - Frontend de escritorio: Electron, React, Vite, Tailwind CSS, Three.js
 - Backend: Laravel 12
-- Infraestructura local: Docker, Nginx, MySQL, Redis
+- Infraestructura local: Docker, Nginx, MySQL, Redis, MongoDB
 - Gestión de código: GitHub
   
 ## Estructura del repositorio
@@ -58,6 +58,7 @@ Herramientas recomendadas para todo el equipo:
 Herramientas por necesidad:
 
 - MySQL client si alguien quiere inspeccionar base de datos fuera de Docker
+- MongoDB Compass si alguien quiere inspeccionar los recursos visuales almacenados en MongoDB
 - Editor con soporte para JS, JSX, PHP, Markdown y YAML
 
 ## Puesta en marcha rápida
@@ -68,18 +69,20 @@ Herramientas por necesidad:
 2. Abrir la carpeta del proyecto.
 3. Levantar el backend:
    - `docker compose up -d --build`
-4. Ejecutar dependencias en docker app:
-   - `composer install`
+4. Instalar dependencias del backend:
+   - `cd backend && composer install`
 5. Ejecutar migraciones:
    - `docker compose exec app php artisan migrate --force`
-6. Copiar `backend/.env.example` y crear `backend/.env`.
-7. Crear la key en Docker:
+6. Verificar MongoDB desde Laravel:
+   - `docker compose exec app php artisan mongo:check`
+7. Copiar `backend/.env.example` y crear `backend/.env`.
+8. Crear la key en Docker:
    - `docker exec csic_app php artisan key:generate`
-8. Entrar en `desktop/` e instalar dependencias:
+9. Entrar en `desktop/` e instalar dependencias:
    - `npm install`
-9. Arrancar la app de escritorio:
+10. Arrancar la app de escritorio:
    - `npm run electron:dev`
-10. Verificar que la API responde en:
+11. Verificar que la API responde en:
    - `http://localhost:8180/api/health`
 
 ### Comandos de referencia
@@ -88,6 +91,7 @@ Herramientas por necesidad:
   - `docker compose up -d --build`
   - `docker compose down`
   - `docker compose exec app php artisan migrate --force`
+  - `docker compose exec app php artisan mongo:check`
 - Desktop:
   - `cd desktop && npm install`
   - `cd desktop && npm run electron:dev`
@@ -100,8 +104,52 @@ Herramientas por necesidad:
 
 - Laravel / Nginx: `8180`
 - MySQL: `3106`
+- MongoDB: `27018` desde tu equipo, `27017` dentro de Docker
 - Redis: `6179`
 - Vite dev server: `5173`
+
+## MongoDB local
+
+MongoDB queda dedicado a los recursos visuales 3D o fotografias de sensores. MySQL sigue siendo la base principal para datos estructurados.
+
+### Variables de entorno del backend
+
+En `backend/.env` y `backend/.env.example` quedan disponibles estas variables:
+
+- `MONGO_HOST=mongo`
+- `MONGO_PORT=27017`
+- `MONGO_DATABASE=csic_database`
+- `MONGO_URI=` como override opcional si alguna vez necesitas una URI completa
+
+Desde Laravel, la conexion usa el host `mongo` porque el backend corre dentro de la red de Docker. Desde tu equipo host, MongoDB se expone por `localhost:27018`.
+
+### Verificacion rapida
+
+1. Levanta el stack:
+   - `docker compose up -d --build`
+2. Comprueba que Mongo esta levantado:
+   - `docker compose ps`
+3. Ejecuta la comprobacion desde Laravel:
+   - `docker compose exec app php artisan mongo:check`
+
+Si el comando termina bien, Laravel puede conectarse, hacer ping a MongoDB y completar una escritura/lectura tecnica de prueba.
+
+### Uso con MongoDB Compass
+
+Usa esta conexion desde MongoDB Compass en tu equipo:
+
+```text
+mongodb://localhost:27018
+```
+
+Datos importantes:
+
+- Base esperada: `csic_database`
+- Acceso desde host: `localhost:27018`
+- Acceso desde Docker: `mongo:27017`
+- Si Compass no conecta, revisa antes `docker compose ps` y confirma que `csic_mongo` aparece levantado o healthy
+
+Cuando entres con Compass, deberias ver la base `csic_database`. La coleccion `visual_resources` queda reservada para los recursos visuales del proyecto. El comando `mongo:check` usa una coleccion tecnica temporal llamada `__smoke_tests`.
 
 ## Qué hace cada carpeta
 
