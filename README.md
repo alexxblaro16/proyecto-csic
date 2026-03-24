@@ -2,7 +2,7 @@
 
 Base de trabajo para una aplicación de escritorio con `Electron + React + Vite` en el cliente y `Laravel` como API, con entorno backend apoyado en Docker.
 
-Este repositorio esta preparado para que varios equipos trabajen en paralelo con el menor número de bloqueos posible: documentacion en español, flujo de ramas, plantillas de incidencias y PRs, y comprobaciones automáticas basicas en GitHub Actions.
+Este repositorio está preparado para que varios equipos trabajen en paralelo con el menor número de bloqueos posible: Documentación en español, flujo de ramas, plantillas de incidencias y PRs, y comprobaciones automáticas básicas en GitHub Actions.
 
 ## Stack del proyecto
 
@@ -25,7 +25,7 @@ Este repositorio esta preparado para que varios equipos trabajen en paralelo con
 
 ## Modelo de colaboración en GitHub
 
-Este repositorio esta preparado para trabajar así:
+Este repositorio está preparado para trabajar así:
 
 - El repositorio puede mantenerse `public`.
 - Sólo los leads del proyecto se añaden como colaboradores con permisos de escritura.
@@ -144,8 +144,8 @@ Herramientas por necesidad:
 
 ### 3D / 360Photo
 
-- Trabajar la integracion visual e interactiva en el cliente
-- Mantener escenas, visores, assets y logica de rendering
+- Trabajar la integración visual e interactiva en el cliente
+- Mantener escenas, visores, assets y lógica de rendering
 - Coordinarse con UI/UX para que la capa 3D encaje en la experiencia
 
 ### QA
@@ -156,7 +156,7 @@ Herramientas por necesidad:
 
 ### Deployment
 
-- Mantener Docker, pipelines y configuracion de despliegue
+- Mantener Docker, pipelines y configuración de despliegue
 - Evolucionar la carpeta `.github/workflows/`
 - Preparar entornos de integración y producción más adelante
 
@@ -172,7 +172,7 @@ Los leads pueden empujar a ramas de trabajo propias o compartidas, pero la integ
 1. Actualizar `main` en GitHub .
 2. Si no eres lead, sincronizar primero tu fork con el repositorio principal.
 3. Crear una rama nueva desde `main`.
-4. Trabajar solo en esa rama.
+4. Trabajar sólo en esa rama.
 5. Hacer commits pequeños y descriptivos.
 6. Publicar la rama.
 7. Abrir Pull Request contra este repositorio.
@@ -212,11 +212,11 @@ El repositorio ya incluye reglas para evitar la mayoría de estos casos, pero ca
 
 ## Documentación adicional
 
-- [Guia de contribucion](./CONTRIBUTING.md)
+- [Guía de contribución](./CONTRIBUTING.md)
 - [Arquitectura](./docs/arquitectura.md)
 - [Setup local](./docs/setup-local.md)
 - [Roles y flujo entre equipos](./docs/roles-y-flujo.md)
-- [Configuracion del repositorio en GitHub](./docs/github-repo-setup.md)
+- [Configuración del repositorio en GitHub](./docs/github-repo-setup.md)
 
 ## Roadmap inmediato por equipo
 
@@ -240,7 +240,7 @@ El repositorio ya incluye reglas para evitar la mayoría de estos casos, pero ca
 - Exigir que el workflow de CI esté en verde
 - Configurar reviewers automaticos con `CODEOWNERS`
 - Mantener los cambios pequeños y orientados a un solo objetivo
-- Mantener como colaboradores solo a los leads del proyecto
+- Mantener como colaboradores sólo a los leads del proyecto
 - Pedir al resto del equipo que contribuya desde forks
 
 ## Configuración recomendada del repositorio
