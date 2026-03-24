@@ -9,8 +9,8 @@ Este repositorio esta preparado para que varios equipos trabajen en paralelo con
 - Frontend de escritorio: Electron, React, Vite, Tailwind CSS, Three.js
 - Backend: Laravel 12
 - Infraestructura local: Docker, Nginx, MySQL, Redis
-- Gestion de codigo: GitHub + GitHub Desktop
-
+- Gestión de código: GitHub
+  
 ## Estructura del repositorio
 
 ```text
@@ -49,7 +49,6 @@ Si cambia el grupo de leads, actualizad tambien [`.github/CODEOWNERS`](./.github
 
 Herramientas recomendadas para todo el equipo:
 
-- GitHub Desktop
 - Git
 - Docker Desktop
 - Node.js 22 o superior
@@ -65,7 +64,7 @@ Herramientas por necesidad:
 
 ### Primer dia
 
-1. Clonar el repositorio con GitHub Desktop.
+1. Clonar el repositorio con .
 2. Abrir la carpeta del proyecto.
 3. Levantar el backend:
    - `docker compose up -d --build`
@@ -161,7 +160,7 @@ Herramientas por necesidad:
 - Evolucionar la carpeta `.github/workflows/`
 - Preparar entornos de integracion y produccion mas adelante
 
-## Flujo de trabajo con GitHub Desktop
+## Flujo de trabajo con GitHub 
 
 ### Regla principal
 
@@ -170,7 +169,7 @@ Los leads pueden empujar a ramas de trabajo propias o compartidas, pero la integ
 
 ### Flujo recomendado
 
-1. Actualizar `main` en GitHub Desktop.
+1. Actualizar `main` en GitHub .
 2. Si no eres lead, sincronizar primero tu fork con el repositorio principal.
 3. Crear una rama nueva desde `main`.
 4. Trabajar solo en esa rama.
