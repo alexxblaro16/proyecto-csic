@@ -6,7 +6,10 @@
 5. Ir al localhost que indica (deberia ser http://localhost:5173)
 6. Scroll down (si aun no lo hemos integrado bien)
 7. (enter + h) en consola para acciones vite y (enter + q) para terminar programa
-   
+
+// El codigo principal esta en electron/script.js y src/main.jsx
+// El codigo esta en main.jsx para que aparezca en la pagina directamente, pero habra que quitarlo en algun momento
+
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
