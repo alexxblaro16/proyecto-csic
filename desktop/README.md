@@ -1,3 +1,10 @@
+// Tutorial para abrir el projecto:
+1. Descargar la carpeta desktop entera
+2. Abrirla en visual studio code
+3. En la terminal de Visual, escribir npm install
+4. Para hacer build, escribir npm run dev
+5. Ir al localhost que indica (deberia ser http://localhost:5173)
+   
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
