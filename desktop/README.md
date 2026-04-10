@@ -4,6 +4,7 @@
 3. En la terminal de Visual, escribir npm install
 4. Para hacer build, escribir npm run dev
 5. Ir al localhost que indica (deberia ser http://localhost:5173)
+6. Scroll down (si aun no lo hemos integrado bien)
    
 # React + Vite
 
