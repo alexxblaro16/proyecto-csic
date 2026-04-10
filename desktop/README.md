@@ -5,6 +5,7 @@
 4. Para hacer build, escribir npm run dev
 5. Ir al localhost que indica (deberia ser http://localhost:5173)
 6. Scroll down (si aun no lo hemos integrado bien)
+7. (enter + h) en consola para acciones vite y (enter + q) para terminar programa
    
 # React + Vite
 
