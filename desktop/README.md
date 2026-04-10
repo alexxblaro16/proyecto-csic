@@ -7,8 +7,8 @@
 6. Scroll down (si aun no lo hemos integrado bien)
 7. (enter + h) en consola para acciones vite y (enter + q) para terminar programa
 
-// El codigo principal esta en electron/script.js y src/main.jsx
-// El codigo esta en main.jsx para que aparezca en la pagina directamente, pero habra que quitarlo en algun momento
+// El codigo principal esta en electron/script.js y src/main.jsx <br>
+// El codigo esta en main.jsx para que aparezca en la pagina directamente, pero habra que quitarlo en algun momento <br>
 
 # React + Vite
 
