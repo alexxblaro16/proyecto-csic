@@ -9,13 +9,18 @@
 
 ## Resumen en 30 segundos
 
-1. Trabajamos sobre **MI FORK** (`alexxblaro16/proyecto-csic`), no sobre el original.
-2. Cada uno en **su rama** (`feature/frontend-...`), nunca en `main`.
-3. Antes de empezar a tocar código → **PULL**.
-4. Después de cada cambio → **COMMIT con mensaje claro**.
-5. Al terminar el día o la tarea → **PUSH**.
-6. Cuando esté listo para revisar → **PR contra mi fork** (no contra el original).
-7. Yo reviso, mergeo en mi fork, y cuando el bloque está terminado, yo subo al original.
+1. Trabajamos en **MI FORK**, no en el original.
+2. Cada uno tiene **SU rama propia y fija**:
+   - Kevin → rama `kevin`
+   - Andrea → rama `andrea`
+   - Gabriel → rama `gabriel`
+3. **NUNCA cambiéis de rama**. Tu rama es tu rama, siempre la misma.
+4. **NUNCA toquéis `main`**. Esa rama la controlo yo.
+5. Trabajamos solo dentro de la carpeta `desktop/`. El resto NI MIRAR.
+6. Antes de empezar a tocar código → **PULL**.
+7. Después de cada cambio → **COMMIT con mensaje claro**.
+8. Al terminar → **PUSH**.
+9. Cuando tengáis algo listo, me avisáis. Yo decido qué se lleva a `main`.
 
 ---
 
@@ -28,7 +33,7 @@ https://github.com/alexxblaro16/proyecto-csic/invitations
 Aceptadla. Si no os llega en 5 minutos, decídmelo.
 
 ### 1.2. Configurar Git con vuestro nombre y email
-Solo si no lo habéis hecho ya:
+Solo si no lo habéis hecho antes:
 ```bash
 git config --global user.name "Vuestro Nombre"
 git config --global user.email "vuestro@email.com"
@@ -36,95 +41,62 @@ git config --global user.email "vuestro@email.com"
 Usad el mismo email que tenéis en GitHub.
 
 ### 1.3. Clonar mi fork
-Donde queráis tener el proyecto:
+Donde queráis tener el proyecto en vuestro ordenador:
 ```bash
 git clone https://github.com/alexxblaro16/proyecto-csic.git
 cd proyecto-csic
 ```
 
-### 1.4. Añadir el repo original como referencia (recomendado)
-Esto os deja traer cambios cuando otros equipos suban cosas, sin riesgo de subir al original:
+### 1.4. Cambiar a VUESTRA rama (la única vez que cambiáis de rama)
 ```bash
-git remote add upstream https://github.com/PRNovoa/proyecto-csic.git
-git remote set-url --push upstream NO_PUSH
+git checkout kevin     # si eres Kevin
+git checkout andrea    # si eres Andrea
+git checkout gabriel   # si eres Gabriel
 ```
 
-Comprobad que queda así:
-```bash
-git remote -v
-```
-Tenéis que ver:
-- `origin` → mi fork (fetch y push)
-- `upstream` → repo original (fetch sí, push BLOQUEADO)
+A partir de aquí, **no volváis a tocar el comando `git checkout` nunca más**. Estáis en vuestra rama y ahí os quedáis para siempre.
 
 ---
 
-## 2. Flujo diario — los 4 pasos sagrados
+## 2. Flujo diario — los 3 pasos sagrados
 
 ### Paso 1: PULL antes de empezar (siempre)
+
 **Cada vez que vais a sentaros a trabajar:**
 ```bash
-git checkout main
-git pull origin main
-```
-Esto baja los últimos cambios del fork. Si os saltáis esto, vais a tener conflictos al subir.
-
-### Paso 2: Crear o cambiar a vuestra rama
-Si la tarea es nueva, creáis rama:
-```bash
-git checkout -b feature/frontend-login-kevin
+git pull
 ```
 
-Si la rama ya existe (ya estabais trabajando en ella):
-```bash
-git checkout feature/frontend-login-kevin
-git pull origin feature/frontend-login-kevin
-```
+Esto baja los últimos cambios de vuestra rama (por si el ordenador se reinició, por si trabajasteis desde otro sitio, etc.).
 
-**Convención de nombres** (obligatoria):
-- `feature/frontend-loquesea-tunombre` → nueva funcionalidad
-- `fix/frontend-loquesea-tunombre` → arreglo de bug
-- `docs/frontend-loquesea-tunombre` → solo documentación
-
-Ejemplos buenos:
-- `feature/frontend-formulario-login-kevin`
-- `feature/frontend-vista-mapa-andrea`
-- `fix/frontend-boton-roto-gabriel`
-
-Ejemplos malos:
-- `mi-rama` (no se sabe qué es ni de quién)
-- `cambios` (cambios de qué)
-- `kevin` (no se sabe qué hace)
-
-### Paso 3: COMMIT con mensaje claro (cada vez que termináis algo coherente)
+### Paso 2: Trabajar y hacer COMMITs con mensajes claros
 
 **Comprobad qué habéis cambiado** antes de hacer commit:
 ```bash
 git status
-git diff
 ```
 
-**Añadid los archivos:**
+**Añadid los cambios:**
 ```bash
 git add .
 ```
-(Si solo queréis subir uno: `git add ruta/del/archivo.jsx`)
 
 **Hacer el commit con mensaje EXPLICADO:**
 ```bash
 git commit -m "feat: añadir formulario de login con validación de email"
 ```
 
-#### REGLA DE ORO: el mensaje de commit
+#### REGLA DE ORO del mensaje de commit
 
-> Si yo (o cualquiera del equipo) leo solo el mensaje, debo entender qué hiciste **sin abrir el código**.
+> Si yo (o cualquiera del equipo) leo SOLO el mensaje del commit, debo entender qué hiciste **sin abrir el código**.
 
-**Estructura del mensaje:**
+**Estructura:**
 ```
-tipo: descripción corta en presente
+tipo: descripción corta y clara
 ```
 
 **Tipos que vamos a usar:**
+
 | Prefijo | Cuándo usarlo |
 |---------|--------------|
 | `feat:` | Funcionalidad nueva |
@@ -132,7 +104,7 @@ tipo: descripción corta en presente
 | `style:` | Cambios de estilos CSS / Tailwind |
 | `refactor:` | Reescribir sin cambiar comportamiento |
 | `docs:` | Documentación |
-| `chore:` | Tareas técnicas (deps, configs) |
+| `chore:` | Tareas técnicas (dependencias, configs) |
 
 **Ejemplos buenos:**
 - `feat: añadir botón de logout en el header`
@@ -142,133 +114,146 @@ tipo: descripción corta en presente
 - `docs: añadir comentarios al hook useAuth`
 
 **Ejemplos PROHIBIDOS:**
-- `cambios` (qué cambios)
+- `cambios` (cambios de qué)
 - `arreglo` (arreglo de qué)
-- `wip` (trabajo en progreso, no subir esto)
+- `wip` (no subir trabajo a medio hacer)
 - `asdf` (en serio)
 - `update` (no aporta nada)
 - `final` (nunca es final)
+- `.` (no)
 
 #### Cuándo hacer commit
-- Cuando termináis una pieza coherente (un componente, una función, un fix)
+
+- Cada vez que terminéis algo coherente (un componente, una función, un fix)
 - **NO esperéis al final del día** para hacer un mega-commit con todo. Mejor 5 commits pequeños y claros que 1 enorme.
 - Si lleváis 2 horas sin hacer commit, **es señal de que algo va mal**.
 
-### Paso 4: PUSH (subir vuestra rama a mi fork)
+### Paso 3: PUSH (subir vuestra rama al fork)
 
-La primera vez que subís una rama nueva:
-```bash
-git push -u origin feature/frontend-login-kevin
-```
-El `-u` es para que git recuerde a qué rama remota apunta. Solo se pone la primera vez.
-
-Las siguientes veces, en la misma rama, basta con:
 ```bash
 git push
 ```
 
-**Hacer push al menos una vez al día**, aunque no hayáis terminado. Así si se os rompe el ordenador, no perdéis nada.
+**Hacer push al menos una vez al día**, aunque no hayáis terminado. Si se rompe el ordenador, no se pierde nada.
 
 ---
 
-## 3. Cuando termináis la tarea: abrir Pull Request
+## 3. Donde se trabaja: SOLO `desktop/`
+
+Toda la parte de Front está en la carpeta `desktop/`:
+
+- `desktop/src/` → código React (componentes, vistas, lógica)
+- `desktop/src/components/` → componentes reutilizables
+- `desktop/electron/` → configuración de Electron (no tocar salvo que sepáis qué hacéis)
+- `desktop/public/` → recursos estáticos
+- `desktop/package.json` → dependencias del front
+
+**Las demás carpetas (`backend/`, `docker/`, `docs/`) NO se tocan.** Si necesitáis algo de ahí, decídmelo.
+
+Si subís cambios fuera de `desktop/`, los rechazo automáticamente.
+
+---
+
+## 4. Cuando termináis algo importante, avisadme
+
+Cuando hayáis hecho algo que esté para revisar (un componente terminado, un fix funcional, una vista nueva acabada):
 
 1. Aseguraos de que tenéis todo subido:
    ```bash
    git status
    git push
    ```
-2. Id a https://github.com/alexxblaro16/proyecto-csic/pulls
-3. Click en **"New pull request"**
-4. **CUIDADO con la base** — GitHub a veces propone hacer PR contra el original. Tiene que quedar así:
-   - **base repository:** `alexxblaro16/proyecto-csic`
-   - **base:** `main`
-   - **compare:** vuestra rama `feature/frontend-...`
-5. Título de la PR: claro y descriptivo (mismo estilo que los commits)
-6. Descripción: qué habéis hecho, qué falta, qué hay que probar
-7. Asignadme a mí como **reviewer**
-8. Click **"Create pull request"**
+2. **Avisadme por WhatsApp** con qué habéis hecho.
+3. Yo miro vuestra rama, decido qué cojo de ahí y qué no, y lo paso a `main`.
+4. Si algo necesita arreglo, os escribo y lo modificáis en vuestra rama.
 
-Yo reviso, comento si hace falta, y mergeo cuando esté bien.
+**No abráis Pull Requests vosotros.** Las gestiono yo.
 
 ---
 
-## 4. Reglas NO negociables
+## 5. Reglas NO negociables
 
 | ✅ Sí | ❌ No |
 |---|---|
-| Trabajar en mi fork | Tocar el repo de PRNovoa |
-| Una rama por tarea | Trabajar directo en `main` |
-| Commits pequeños y claros | Commits "wip" o "asdf" |
+| Trabajar SIEMPRE en vuestra rama propia | Cambiar a `main` o a la rama de otro |
+| Solo tocar archivos de `desktop/` | Tocar `backend/`, `docker/`, `docs/` |
+| Commits pequeños con mensaje claro | Commits "wip", "asdf", "cambios" |
 | `git pull` antes de empezar | Empezar sin actualizar |
-| `git push` al terminar el día | Dejar el código solo en local una semana |
-| PR contra MI fork | PR contra el original (eso lo hago yo) |
+| `git push` al menos una vez al día | Dejar el código solo en local una semana |
+| Avisarme cuando algo está listo | Abrir PRs vosotros |
 | Avisarme si algo falla | `git push --force` o `git reset --hard` |
 
 ---
 
-## 5. Errores comunes y cómo arreglarlos
+## 6. Errores comunes y cómo arreglarlos
+
+### "He cambiado de rama por error"
+Volved a la vuestra:
+```bash
+git checkout kevin    # o andrea / gabriel
+```
 
 ### "He hecho cambios pero no quiero commitearlos todavía"
 Guardarlos temporalmente:
 ```bash
 git stash
 ```
-Recuperarlos después:
+Recuperarlos cuando queráis:
 ```bash
 git stash pop
 ```
 
-### "He hecho commit en main por error"
-**No hagáis nada más, avisadme.** Lo arreglamos juntos. Si pusheas, peor.
-
-### "Git me dice que tengo conflictos al hacer pull"
-**Parad. Avisadme.** No intentéis resolver el conflicto a ciegas si no sabéis. Compartid el mensaje exacto que os sale.
-
 ### "He hecho commit con un mensaje malísimo"
 Si NO habéis hecho push todavía:
 ```bash
-git commit --amend -m "feat: mensaje correcto esta vez"
+git commit --amend -m "feat: mensaje correcto"
 ```
-Si ya habéis hecho push, dejadlo. No reescribáis historia compartida.
+Si ya habéis hecho push, dejadlo. No reescribáis lo que ya está subido.
 
-### "Quiero ver qué ramas hay"
+### "Git me dice que tengo conflictos al hacer pull"
+**Parad. Avisadme.** No intentéis resolverlo a ciegas. Compartid el mensaje exacto que os sale.
+
+### "He hecho commit en la rama equivocada"
+Avisadme. No hagáis nada más. Lo arreglamos.
+
+### "Quiero ver en qué rama estoy"
 ```bash
-git branch -a
+git branch
 ```
+La rama actual sale con un asterisco (*). Tiene que ser la vuestra.
 
-### "Quiero ver el historial"
+### "Quiero ver el historial de commits"
 ```bash
-git log --oneline --graph --all
+git log --oneline
 ```
 
 ---
 
-## 6. Chuleta final (imprimir y pegar en la mesa)
+## 7. Chuleta final (imprimir y pegar en la mesa)
 
 ```bash
+# UNA SOLA VEZ (al clonar el repo)
+git clone https://github.com/alexxblaro16/proyecto-csic.git
+cd proyecto-csic
+git checkout TU_NOMBRE     # kevin, andrea o gabriel
+
 # AL EMPEZAR EL DÍA
-git checkout main
-git pull origin main
-git checkout -b feature/frontend-loquesea-tunombre   # solo si es rama nueva
-git checkout feature/frontend-loquesea-tunombre      # si ya existe
-git pull origin feature/frontend-loquesea-tunombre   # si ya existe
+git pull
 
 # DURANTE EL DÍA, CADA VEZ QUE TERMINÁIS ALGO COHERENTE
-git status                                            # ver qué hay
+git status                                            # ver qué habéis cambiado
 git add .                                             # añadir cambios
 git commit -m "feat: descripción clara de qué hice"   # commit con mensaje BUENO
-git push                                              # subir (la primera vez: git push -u origin nombre-rama)
+git push                                              # subir al fork
 
-# AL TERMINAR LA TAREA
-# 1. git push (asegurarse de que está todo subido)
-# 2. Abrir PR en GitHub contra alexxblaro16/proyecto-csic
-# 3. Asignarme como reviewer
+# CUANDO ALGO ESTÁ LISTO PARA QUE LO REVISE
+# 1. git push (que esté todo subido)
+# 2. Avisarme por WhatsApp
 ```
 
 ---
 
-## 7. Cualquier duda
+## 8. Cualquier duda
 
 Antes de tocar algo que no sabéis, **preguntadme**. Tardo 2 minutos en responder y os ahorro media hora de marrón.
 
