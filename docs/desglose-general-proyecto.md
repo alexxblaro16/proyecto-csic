@@ -333,7 +333,7 @@ entenderse como una posible ampliación futura.
 >
 > Laura Gómez Sange
 
-**• Deployment**
+**• Deployment/Api Management**
 
 > Lead: Carlos Parra
 >
