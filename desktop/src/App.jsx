@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import ThreeScene from './components/ThreeScene.jsx'
-import CreateMuseumForm from './components/CreateMuseumForm.jsx'
 
 function App() {
   const [apiStatus, setApiStatus] = useState('Not checked yet')
@@ -106,28 +105,6 @@ function App() {
               <li>Replace the demo cube with your real scene or model loader.</li>
               <li>Add real Laravel endpoints and swap the health check for app data.</li>
               <li>Move the API base URL into a Vite environment variable when you need multiple environments.</li>
-            </ul>
-          </aside>
-        </section>
-
-        <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <CreateMuseumForm />
-
-          <aside className="rounded-3xl border border-white/10 bg-white/5 p-6">
-            <h2 className="text-2xl font-semibold text-white">Estado de la Tarea</h2>
-            <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-300">
-              <li className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-cyan-400"></span>
-                Estructura de campos básicos finalizada.
-              </li>
-              <li className="flex items-center gap-2 text-slate-500">
-                <span className="h-2 w-2 rounded-full bg-slate-600"></span>
-                Lógica de validación (Sprint 2).
-              </li>
-              <li className="flex items-center gap-2 text-slate-500">
-                <span className="h-2 w-2 rounded-full bg-slate-600"></span>
-                Conexión con endpoint de Laravel (Sprint 2).
-              </li>
             </ul>
           </aside>
         </section>
