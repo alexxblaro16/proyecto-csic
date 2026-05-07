@@ -95,7 +95,7 @@ function App() {
           <div className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900/80 p-4">
             <div className="mb-4">
               <h2 className="text-2xl font-semibold text-white">Three.js preview</h2>
-              <p className="text-sm text-slate-400">A minimal animated scene to prove the rendering pipeline is ready.</p>
+              <p className="text-sm text-slate-400">Doubleclick to create, click to inspect.</p>
             </div>
             <ThreeScene />
           </div>
