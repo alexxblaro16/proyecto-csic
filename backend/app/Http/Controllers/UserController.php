@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
@@ -23,26 +22,19 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email',
-                'password' => 'required|string|min:8',
-            ]);
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8',
+        ]);
 
-            $usuario = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
-            ]);
+        $usuario = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+        ]);
 
-            return response()->json($usuario, 201);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'ok' => false,
-                'errors' => $e->errors()
-            ], 422);
-        }
+        return response()->json($usuario, 201);
     }
 
     /**
@@ -67,35 +59,28 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        try {
-            $usuario = User::find($id);
+        $usuario = User::find($id);
 
-            if (!$usuario) {
-                return response()->json([
-                    'ok' => false,
-                    'message' => 'Usuario no encontrado'
-                ], 404);
-            }
-
-            $validated = $request->validate([
-                'name' => 'sometimes|required|string|max:255',
-                'email' => 'sometimes|required|email|unique:users,email,' . $id,
-                'password' => 'sometimes|required|string|min:8',
-            ]);
-
-            if (isset($validated['password'])) {
-                $validated['password'] = Hash::make($validated['password']);
-            }
-
-            $usuario->update($validated);
-
-            return response()->json($usuario);
-        } catch (ValidationException $e) {
+        if (!$usuario) {
             return response()->json([
                 'ok' => false,
-                'errors' => $e->errors()
-            ], 422);
+                'message' => 'Usuario no encontrado'
+            ], 404);
         }
+
+        $validated = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|unique:users,email,' . $id,
+            'password' => 'sometimes|required|string|min:8',
+        ]);
+
+        if (isset($validated['password'])) {
+            $validated['password'] = Hash::make($validated['password']);
+        }
+
+        $usuario->update($validated);
+
+        return response()->json($usuario);
     }
 
     /**
@@ -120,3 +105,7 @@ class UserController extends Controller
         ]);
     }
 }
+
+
+    
+

@@ -6,12 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sensor extends Model
 {
-    protected $table = 'sensor';
+    protected $table = 'sensores';
 
     protected $fillable = [
         'ubicacion_id',
         'referencia',
         'estado',
+        'eje_x',
+        'eje_y',
+        'eje_z',
         'notas'
     ];
 
@@ -22,6 +25,6 @@ class Sensor extends Model
 
     public function medidas()
     {
-        return $this->hasMany(Medida::class, 'sensor_id');
+        return $this->hasMany(Medicion::class, 'sensor_id');
     }
 }

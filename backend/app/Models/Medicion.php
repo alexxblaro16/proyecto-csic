@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Medida extends Model
+class Medicion extends Model
 {
-    protected $table = 'medida';
+    protected $table = 'mediciones';
 
     protected $fillable = [
         'sensor_id',

@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('medida', function (Blueprint $table) {
+        Schema::create('mediciones', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('sensor_id');
-            $table->unsignedBigInteger('campania_id');
+            $table->unsignedBigInteger('campania_id')->nullable();
             $table->timestamp('fecha');
             $table->decimal('valor_ph', 5, 2)->nullable(); 
             $table->decimal('temperatura', 5, 2)->nullable();
@@ -23,8 +23,8 @@ return new class extends Migration
             $table->string('observaciones', 255)->nullable();
             $table->timestamps();
 
-            $table->foreign('sensor_id')->references('id')->on('sensor')->onDelete('cascade');
-            $table->foreign('campania_id')->references('id')->on('campania');
+            $table->foreign('sensor_id')->references('id')->on('sensores')->onDelete('cascade');
+            $table->foreign('campania_id')->references('id')->on('campanias');
             
         });
     }
@@ -34,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('medida');
+        Schema::dropIfExists('mediciones');
     }
 };

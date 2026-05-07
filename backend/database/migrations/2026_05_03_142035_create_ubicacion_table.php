@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ubicacion', function (Blueprint $table) {
+        Schema::create('ubicaciones', function (Blueprint $table) {
             $table->id();
-            $table->string('coordenadas', 100); /// posicion 
-            $table->string('descripcion', 100); // nombre del lugar
+            $table->unsignedBigInteger('museo_id');
+            $table->string('posicion', 100);
+            $table->string('nombre', 100); // nombre del lugar
             $table->boolean('es_exterior')->default(false);
             $table->string('notas', 255)->nullable();
 
-
+            $table->foreign('museo_id')->references('id')->on('museos')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ubicacion');
+        Schema::dropIfExists('ubicaciones');
     }
 };

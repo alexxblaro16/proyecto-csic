@@ -17,6 +17,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             MuseoSeeder::class,
+            CampaniaSeeder::class,
+            UbicacionSeeder::class,
+            SensorSeeder::class,
+            MedicionSeeder::class,
+            ImagenSeeder::class,
         ]);
     }
 }

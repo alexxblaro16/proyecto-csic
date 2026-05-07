@@ -16,6 +16,10 @@ class Museo extends Model
         'categoria'
     ];
 
-
+    public function ubicaciones()
+    {
+        return $this->hasMany(Ubicacion::class, 'museo_id');
+    }
+    
 
 }

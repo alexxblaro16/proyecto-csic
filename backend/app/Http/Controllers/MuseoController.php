@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use App\Models\Museo;
+use Illuminate\Http\Request;
 
 class MuseoController extends Controller
 {
@@ -22,23 +21,16 @@ class MuseoController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $validated = $request->validate([
-                'nombre' => 'required|string|max:255',
-                'ciudad' => 'required|string|max:255',
-                'pais' => 'required|string|max:255',
-                'descripcion' => 'nullable|string',
-                'categoria' => 'nullable|string|max:255',
-            ]);
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'ciudad' => 'required|string|max:255',
+            'pais' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'categoria' => 'nullable|string|max:255',
+        ]);
 
-            $museo = Museo::create($validated);
-            return response()->json($museo, 201);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'ok' => false,
-                'errors' => $e->errors()
-            ], 422);
-        }
+        $museo = Museo::create($validated);
+        return response()->json($museo, 201);
     }
 
     /**
@@ -63,32 +55,25 @@ class MuseoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        try {
-            $museo = Museo::find($id);
+        $museo = Museo::find($id);
 
-            if (!$museo) {
-                return response()->json([
-                    'ok' => false,
-                    'message' => 'Museo no encontrado'
-                ], 404);
-            }
-
-            $validated = $request->validate([
-                'nombre' => 'sometimes|required|string|max:255',
-                'ciudad' => 'sometimes|required|string|max:255',
-                'pais' => 'sometimes|required|string|max:255',
-                'descripcion' => 'nullable|string',
-                'categoria' => 'nullable|string|max:255',
-            ]);
-
-            $museo->update($validated);
-            return response()->json($museo);
-        } catch (ValidationException $e) {
+        if (!$museo) {
             return response()->json([
                 'ok' => false,
-                'errors' => $e->errors()
-            ], 422);
+                'message' => 'Museo no encontrado'
+            ], 404);
         }
+
+        $validated = $request->validate([
+            'nombre' => 'sometimes|required|string|max:255',
+            'ciudad' => 'sometimes|required|string|max:255',
+            'pais' => 'sometimes|required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'categoria' => 'nullable|string|max:255',
+        ]);
+
+        $museo->update($validated);
+        return response()->json($museo);
     }
 
     /**

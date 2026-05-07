@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Campania extends Model
 {
-    protected $table = 'campania';
+    protected $table = 'campanias';
 
     protected $fillable = [
         'nombre',
@@ -18,6 +18,6 @@ class Campania extends Model
 
     public function medidas()
     {
-        return $this->hasMany(Medida::class, 'campania_id');
+        return $this->hasMany(Medicion::class, 'campania_id');
     }
 }

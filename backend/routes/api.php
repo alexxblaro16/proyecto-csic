@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Models\Museo;
 
-Route::get('/health', function () {
+/* Route::get('/health', function () {
     return response()->json([
         'ok' => true,
         'app' => config('app.name'),
@@ -39,15 +39,22 @@ Route::get('/test-mongodb', function () {
             'error' => $e->getMessage()
         ], 500);
     }
-});
+}); */
 
 // Rutas públicas (sin autenticación)
 Route::apiResource('usuarios', App\Http\Controllers\UserController::class);
 Route::apiResource('museos', App\Http\Controllers\MuseoController::class);
+Route::apiResource('ubicaciones', App\Http\Controllers\UbicacionController::class);
+Route::apiResource('sensores', App\Http\Controllers\SensorController::class);
+Route::apiResource('mediciones', App\Http\Controllers\MedicionController::class);
+Route::apiResource('campanias', App\Http\Controllers\CampaniaController::class);
+
+Route::post('/imagenes/upload/{sensor_id}', [App\Http\Controllers\ImagenController::class, 'store']);
+Route::get('/imagenes/{sensor_id}', [App\Http\Controllers\ImagenController::class, 'show']);
 
 // Rutas protegidas (con autenticación)
 Route::middleware('auth:sanctum')->group(function () {
-    // Aquí puedes agregar rutas que requieran autenticación
+    
 });
 
 

@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ubicacion extends Model
 {
-    protected $table = 'ubicacion';
+    protected $table = 'ubicaciones';
 
     protected $fillable = [
-        'coordenadas',
-        'descripcion',
+        'museo_id',
+        'posicion',
+        'nombre',
         'es_exterior',
         'notas'
     ];
@@ -18,5 +19,10 @@ class Ubicacion extends Model
     public function sensores()
     {
         return $this->hasMany(Sensor::class, 'ubicacion_id');
+    }
+
+    public function museo()
+    {
+        return $this->belongsTo(Museo::class, 'museo_id');
     }
 }

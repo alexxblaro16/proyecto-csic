@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('campania', function (Blueprint $table) {
+        Schema::create('campanias', function (Blueprint $table) {
             $table->id();
             $table->string('nombre', 100)->unique();
-            $table->enum('estado', ['primavera', 'otoño', 'invierno', 'verano']);
+            $table->text('descripcion')->nullable();
+            $table->enum('estacion', ['primavera', 'otoño', 'invierno', 'verano']);
             $table->date('fecha_inicio');
             $table->date('fecha_fin')->nullable();
+            $table->text('notas')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('campania');
+        Schema::dropIfExists('campanias');
     }
 };

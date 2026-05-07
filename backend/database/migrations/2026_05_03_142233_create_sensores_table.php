@@ -11,14 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sensor', function (Blueprint $table) {
+        Schema::create('sensores', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('ubicacion_id');
             $table->string('referencia', 100)->unique();
-            $table->enum('estado', ['activo', 'inactivo'])->default('activo');
+            $table->enum('estado', ['activo', 'inactivo', 'en mantenimiento'])->default('activo');
+            $table->decimal('eje_x')->nullable(); 
+            $table->decimal('eje_y')->nullable();
+            $table->decimal('eje_z')->nullable();
             $table->string('notas', 255)->nullable();
 
-            $table->foreign('ubicacion_id')->references('id')->on('ubicacion')->onDelete('cascade');
+            $table->foreign('ubicacion_id')->references('id')->on('ubicaciones')->onDelete('cascade');
 
             $table->timestamps();
         });
@@ -29,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sensor');
+        Schema::dropIfExists('sensores');
     }
 };
