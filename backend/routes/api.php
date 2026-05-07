@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 use App\Models\Product;
+use App\Models\Museo;
 
 Route::get('/health', function () {
     return response()->json([
@@ -39,3 +40,14 @@ Route::get('/test-mongodb', function () {
         ], 500);
     }
 });
+
+// Rutas públicas (sin autenticación)
+Route::apiResource('usuarios', App\Http\Controllers\UserController::class);
+Route::apiResource('museos', App\Http\Controllers\MuseoController::class);
+
+// Rutas protegidas (con autenticación)
+Route::middleware('auth:sanctum')->group(function () {
+    // Aquí puedes agregar rutas que requieran autenticación
+});
+
+
