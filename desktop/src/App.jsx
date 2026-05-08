@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import ThreeScene from './components/ThreeScene.jsx'
 import CreateMuseumForm from './components/CreateMuseumForm.jsx'
 import GraficaPH from './components/GraficaPH.jsx'
+import MuseumView from './views/MuseumView.jsx'
 
 function App() {
   const [apiStatus, setApiStatus] = useState('Not checked yet')
@@ -135,6 +136,10 @@ function App() {
               </li>
             </ul>
           </aside>
+        </section>
+
+        <section className="rounded-3xl border border-white/10 bg-slate-900/80 p-4">
+          <MuseumView />
         </section>
       </div>
     </main>
