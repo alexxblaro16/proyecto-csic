@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import ThreeScene from './components/ThreeScene.jsx'
 import CreateMuseumForm from './components/CreateMuseumForm.jsx'
+import GraficaPH from './components/GraficaPH.jsx'
 
 function App() {
   const [apiStatus, setApiStatus] = useState('Not checked yet')
@@ -108,6 +109,10 @@ function App() {
               <li>Move the API base URL into a Vite environment variable when you need multiple environments.</li>
             </ul>
           </aside>
+        </section>
+
+        <section className="rounded-3xl border border-white/10 bg-slate-900/80 p-4">
+          <GraficaPH />
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
