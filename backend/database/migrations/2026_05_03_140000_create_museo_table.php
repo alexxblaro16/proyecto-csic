@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('museos', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
             $table->string('nombre');
             $table->string('ciudad');
             $table->string('pais');
             $table->string('descripcion');
             $table->string('categoria');
+            $table->timestamps();
         });
     }
 

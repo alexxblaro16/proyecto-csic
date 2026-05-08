@@ -20,7 +20,7 @@ class Sensor extends Model
 
     public function ubicacion()
     {
-        return $this->belongsTo(Ubicacion::class, 'ubicacion_id');
+        return $this->belongsTo(UbicacionSql::class, 'ubicacion_id');
     }
 
     public function medidas()

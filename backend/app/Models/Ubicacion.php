@@ -2,27 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class Ubicacion extends Model
 {
-    protected $table = 'ubicaciones';
+    protected $connection = 'mongodb';
+    protected $collection = 'ubicaciones';
 
     protected $fillable = [
-        'museo_id',
-        'posicion',
-        'nombre',
-        'es_exterior',
-        'notas'
+        'notas',
+        'sensores'
     ];
 
-    public function sensores()
-    {
-        return $this->hasMany(Sensor::class, 'ubicacion_id');
-    }
-
-    public function museo()
-    {
-        return $this->belongsTo(Museo::class, 'museo_id');
-    }
+    protected $casts = [
+        'sensores' => 'array'
+    ];
 }

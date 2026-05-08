@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Ubicacion;
 use App\Models\Museo;
+use App\Models\Sensor;
+use App\Models\Imagen;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,68 +15,46 @@ class UbicacionSeeder extends Seeder
 
     /**
      * Run the database seeds.
+     * 
+     * Crea ubicaciones en MongoDB con sus sensores embebidos.
+     * Los sensores se traen de SQL y se les agrega sus imágenes de MongoDB.
      */
     public function run(): void
     {
-        $museos = Museo::all();
+        // Traer ubicaciones SQL para mapearlas
+        $ubicacionesSql = \App\Models\UbicacionSql::all();
 
-        $ubicaciones = [
-            // Museo del Prado
-            [
-                'museo_id' => $museos->where('nombre', 'Museo del Prado')->first()->id,
-                'posicion' => 'Sala 1 - Pintura Antigua',
-                'nombre' => 'Sala principal dedicada a la pintura antigua española',
-                'es_exterior' => false,
-                'notas' => 'Zona de acceso restringido',
-            ],
-            [
-                'museo_id' => $museos->where('nombre', 'Museo del Prado')->first()->id,
-                'posicion' => 'Sala 2 - Pintura Moderna',
-                'nombre' => 'Galería de pintura moderna del siglo XIX y XX',
-                'es_exterior' => false,
-                'notas' => 'Control especial de iluminación',
-            ],
-            [
-                'museo_id' => $museos->where('nombre', 'Museo del Prado')->first()->id,
-                'posicion' => 'Patio Central',
-                'nombre' => 'Patio central del museo',
-                'es_exterior' => true,
-                'notas' => 'Exposición a elementos naturales',
-            ],
-            // Museo Reina Sofía
-            [
-                'museo_id' => $museos->where('nombre', 'Museo Reina Sofía')->first()->id,
-                'posicion' => 'Planta 2 - Guernica',
-                'nombre' => 'Sala donde se exhibe el Guernica de Picasso',
-                'es_exterior' => false,
-                'notas' => 'Control crítico de temperatura y humedad',
-            ],
-            [
-                'museo_id' => $museos->where('nombre', 'Museo Reina Sofía')->first()->id,
-                'posicion' => 'Planta 3 - Arte Contemporáneo',
-                'nombre' => 'Galerías de arte contemporáneo',
-                'es_exterior' => false,
-                'notas' => 'Iluminación variable según exposición',
-            ],
-            // Museo Thyssen-Bornemisza
-            [
-                'museo_id' => $museos->where('nombre', 'Museo Thyssen-Bornemisza')->first()->id,
-                'posicion' => 'Sala Norte',
-                'nombre' => 'Ala norte del museo con exposición directa solar',
-                'es_exterior' => false,
-                'notas' => 'Alto riesgo de sobrecalentamiento',
-            ],
-            [
-                'museo_id' => $museos->where('nombre', 'Museo Thyssen-Bornemisza')->first()->id,
-                'posicion' => 'Sala Sur',
-                'nombre' => 'Ala sur del museo',
-                'es_exterior' => false,
-                'notas' => 'Temperatura más estable',
-            ],
-        ];
+        foreach ($ubicacionesSql as $ubicacion_sql) {
+            // Traer sensores SQL de esta ubicación
+            $sensores = Sensor::where('ubicacion_id', $ubicacion_sql->id)->get();
+            
+            $sensores_data = [];
+            foreach ($sensores as $sensor) {
+                // Traer imágenes de MongoDB para este sensor
+                $imagenes = Imagen::bySensor($sensor->referencia)->get();
+                
+                $imagenes_data = [];
+                foreach ($imagenes as $imagen) {
+                    $imagenes_data[] = [
+                        '_id' => $imagen->_id,
+                        'archivo' => $imagen->archivo,
+                        'notas' => $imagen->notas,
+                        'fecha_subida' => $imagen->fecha_subida,
+                        'tipo' => $imagen->tipo,
+                    ];
+                }
+                
+                $sensores_data[] = [
+                    'referencia' => $sensor->referencia,
+                    'imagenes' => $imagenes_data
+                ];
+            }
 
-        foreach ($ubicaciones as $ubicacion) {
-            Ubicacion::create($ubicacion);
+            // Crear ubicación en MongoDB solo con _id, notas y sensores con imágenes
+            Ubicacion::create([
+                'notas' => $ubicacion_sql->notas ?? '',
+                'sensores' => $sensores_data
+            ]);
         }
     }
 }

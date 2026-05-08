@@ -22,13 +22,14 @@ class UbicacionController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'museo_id' => 'required|integer|exists:museos,id',
+            'museo_id' => 'required|integer',
             'posicion' => 'required|string|max:255',
             'nombre' => 'nullable|string',
             'es_exterior' => 'nullable|boolean',
             'notas' => 'nullable|string',
         ]);
 
+        $validated['sensores'] = [];
         $ubicacion = Ubicacion::create($validated);
         return response()->json($ubicacion, 201);
     }
@@ -65,7 +66,7 @@ class UbicacionController extends Controller
         }
 
         $validated = $request->validate([
-            'museo_id' => 'sometimes|required|integer|exists:museos,id',
+            'museo_id' => 'sometimes|required|integer',
             'posicion' => 'sometimes|required|string|max:255',
             'nombre' => 'nullable|string|max:255',
             'es_exterior' => 'nullable|boolean',

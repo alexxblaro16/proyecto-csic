@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Sensor;
-use App\Models\Ubicacion;
+use App\Models\UbicacionSql;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -16,7 +16,7 @@ class SensorSeeder extends Seeder
      */
     public function run(): void
     {
-        $ubicaciones = Ubicacion::all();
+        $ubicaciones = UbicacionSql::all();
 
         $sensores = [
             // Sensores para Sala 1 - Pintura Antigua (Prado)

@@ -22,9 +22,11 @@ class ImagenController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'sensor_id' => 'required|integer|exists:mysql.sensores,id',
+            'sensor_referencia' => 'nullable|string',
+            'ubicacion_id' => 'nullable|string',
             'archivo' => 'required|file',
             'notas' => 'nullable|string',
+            'tipo' => 'nullable|string|in:sensor,ubicacion',
         ]);
 
         if ($request->file('archivo')) {
@@ -33,17 +35,18 @@ class ImagenController extends Controller
         }
 
         $validated['fecha_subida'] = now();
+        $validated['tipo'] = $validated['tipo'] ?? 'sensor';
 
         $imagen = Imagen::create($validated);
         return response()->json($imagen, 201);
     }
 
     /**
-     * Mostrar imágenes de un sensor específico
+     * Obtener imágenes de un sensor por referencia
      */
-    public function show($sensor_id)
+    public function showBySensor($sensor_referencia)
     {
-        $imagenes = Imagen::where('sensor_id', (int)$sensor_id)->get();
+        $imagenes = Imagen::bySensor($sensor_referencia)->get();
 
         if ($imagenes->isEmpty()) {
             return response()->json([
@@ -56,11 +59,45 @@ class ImagenController extends Controller
     }
 
     /**
+     * Obtener imágenes de una ubicación
+     */
+    public function showByUbicacion($ubicacion_id)
+    {
+        $imagenes = Imagen::byUbicacion($ubicacion_id)->get();
+
+        if ($imagenes->isEmpty()) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'No hay imágenes para esta ubicación'
+            ], 404);
+        }
+
+        return response()->json($imagenes);
+    }
+
+    /**
+     * Mostrar una imagen específica
+     */
+    public function show($id)
+    {
+        $imagen = Imagen::find($id);
+
+        if (!$imagen) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Imagen no encontrada'
+            ], 404);
+        }
+
+        return response()->json($imagen);
+    }
+
+    /**
      * Actualizar una imagen
      */
     public function update(Request $request, $id)
     {
-        $imagen = Imagen::find((int)$id);
+        $imagen = Imagen::find($id);
 
         if (!$imagen) {
             return response()->json([
@@ -70,7 +107,8 @@ class ImagenController extends Controller
         }
 
         $validated = $request->validate([
-            'sensor_id' => 'sometimes|required|integer|exists:mysql.sensores,id',
+            'sensor_referencia' => 'nullable|string',
+            'ubicacion_id' => 'nullable|string',
             'archivo' => 'sometimes|file',
             'notas' => 'nullable|string',
         ]);
@@ -89,7 +127,7 @@ class ImagenController extends Controller
      */
     public function destroy($id)
     {
-        $imagen = Imagen::find((int)$id);
+        $imagen = Imagen::find($id);
 
         if (!$imagen) {
             return response()->json([

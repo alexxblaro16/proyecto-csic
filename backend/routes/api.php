@@ -48,9 +48,11 @@ Route::apiResource('ubicaciones', App\Http\Controllers\UbicacionController::clas
 Route::apiResource('sensores', App\Http\Controllers\SensorController::class);
 Route::apiResource('mediciones', App\Http\Controllers\MedicionController::class);
 Route::apiResource('campanias', App\Http\Controllers\CampaniaController::class);
+//Route::apiResource('imagenes', App\Http\Controllers\ImagenController::class);
 
-Route::post('/imagenes/upload/{sensor_id}', [App\Http\Controllers\ImagenController::class, 'store']);
-Route::get('/imagenes/{sensor_id}', [App\Http\Controllers\ImagenController::class, 'show']);
+// Rutas específicas para imágenes por sensor o ubicación
+Route::get('/imagenes/sensor/{sensor_referencia}', [App\Http\Controllers\ImagenController::class, 'showBySensor']);
+Route::get('/imagenes/ubicacion/{ubicacion_id}', [App\Http\Controllers\ImagenController::class, 'showByUbicacion']);
 
 // Rutas protegidas (con autenticación)
 Route::middleware('auth:sanctum')->group(function () {

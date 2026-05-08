@@ -17,11 +17,12 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             MuseoSeeder::class,
+            UbicacionSqlSeeder::class,    // SQL ubicaciones (necesita museo_id)
+            SensorSeeder::class,           // SQL sensores (necesita ubicacion_id SQL)
             CampaniaSeeder::class,
-            UbicacionSeeder::class,
-            SensorSeeder::class,
+            ImagenSeeder::class,           // MongoDB imágenes PRIMERO (necesario para embeber en ubicaciones)
+            UbicacionSeeder::class,        // MongoDB ubicaciones con sensores + imágenes embebidos
             MedicionSeeder::class,
-            ImagenSeeder::class,
         ]);
     }
 }
