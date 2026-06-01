@@ -25,4 +25,10 @@ class UbicacionSql extends Model
     {
         return $this->hasMany(Sensor::class, 'ubicacion_id');
     }
+
+    public function mediciones()
+    {
+        return $this->hasMany(Medicion::class, 'ubicacion_id');
+    }
+    
 }

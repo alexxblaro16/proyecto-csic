@@ -28,4 +28,9 @@ class Medicion extends Model
     {
         return $this->belongsTo(Campania::class, 'campania_id');
     }
+
+    public function ubicacion()
+    {
+        return $this->belongsTo(UbicacionSql::class, 'ubicacion_id');   
+    }
 }

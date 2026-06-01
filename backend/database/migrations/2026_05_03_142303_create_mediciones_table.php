@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('mediciones', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('sensor_id');
+            $table->unsignedBigInteger('ubicacion_id')->nullable()->default(null);
             $table->unsignedBigInteger('campania_id')->nullable();
             $table->timestamp('fecha');
             $table->decimal('valor_ph', 5, 2)->nullable(); 
@@ -25,7 +26,7 @@ return new class extends Migration
 
             $table->foreign('sensor_id')->references('id')->on('sensores')->onDelete('cascade');
             $table->foreign('campania_id')->references('id')->on('campanias');
-            
+            $table->foreign('ubicacion_id')->references('id')->on('ubicaciones');
         });
     }
 
