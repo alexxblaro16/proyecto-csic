@@ -49,14 +49,15 @@ function ThreeScene() {
     // Test Sprite
     // Creates base sprite to later make more
     const sprites = [];
-    const map = new THREE.TextureLoader().load( './src/assets/testbird.png' );
+    const map = new THREE.TextureLoader().load( './src/assets/location.png' );
     const material = new THREE.SpriteMaterial( { map: map, transparent: true} );
     const sprite = new THREE.Sprite( material );
+    sprite.scale.set(2, 2, 2);
 
     // Default plane to clone
     const planes = [];
     const planeGeo = new THREE.PlaneGeometry(10, 10);
-    const planeMat = new THREE.MeshBasicMaterial({transparent: true, opacity: 0.5});
+    const planeMat = new THREE.MeshBasicMaterial({transparent: true, opacity: 0.0});
     const plane = new THREE.Mesh(planeGeo, planeMat);
     plane.scale.set(2.1,2.1,2.1);
 
