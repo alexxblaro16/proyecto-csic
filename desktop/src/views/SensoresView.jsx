@@ -1,11 +1,16 @@
-// Vista de Sensores — CONECTADA al back real: GET /api/sensores.
-// Sirve para que Iván compruebe que sus datos sembrados llegan al front.
+// Vista de Sensores — datos REALES del back: GET /api/sensores + GET /api/ubicaciones.
+// La columna "Ubicación" muestra el NOMBRE real de la sala (no el id), resolviendo
+// el cruce sensor<->ubicación por la 'referencia' (las ubicaciones Mongo listan sus
+// sensores por referencia y su nombre está en el campo 'notas').
 import { useEffect, useState } from 'react'
 import ViewLayout from '../components/ViewLayout.jsx'
-import { sensores as apiSensores } from '../api/index.js'
+import { sensores as apiSensores, ubicaciones as apiUbicaciones } from '../api/index.js'
+
+const aLista = (r) => (Array.isArray(r) ? r : r?.data ?? [])
 
 export default function SensoresView() {
   const [sensores, setSensores] = useState([])
+  const [ubicacionPorRef, setUbicacionPorRef] = useState({})
   const [estado, setEstado] = useState('cargando') // cargando | ok | error
   const [error, setError] = useState('')
 
@@ -13,10 +18,24 @@ export default function SensoresView() {
     setEstado('cargando')
     setError('')
     try {
-      const data = await apiSensores.listar()
-      // Laravel apiResource suele devolver array directo o { data: [...] }
-      const lista = Array.isArray(data) ? data : (data?.data ?? [])
-      setSensores(lista)
+      const [sensData, ubicData] = await Promise.all([
+        apiSensores.listar(),
+        apiUbicaciones.listar(),
+      ])
+      const sens = aLista(sensData)
+      const ubic = aLista(ubicData)
+
+      // Mapa: referencia de sensor -> nombre real de su ubicación
+      const mapa = {}
+      for (const u of ubic) {
+        const nombre = u.notas || u.descripcion || u.nombre || '—'
+        for (const s of u.sensores ?? []) {
+          if (s.referencia) mapa[s.referencia] = nombre
+        }
+      }
+
+      setSensores(sens)
+      setUbicacionPorRef(mapa)
       setEstado('ok')
     } catch (e) {
       setError(e.message)
@@ -27,6 +46,9 @@ export default function SensoresView() {
   useEffect(() => {
     cargar()
   }, [])
+
+  const nombreUbicacion = (s) =>
+    ubicacionPorRef[s.referencia] ?? (s.ubicacion_id != null ? `Ubicación ${s.ubicacion_id}` : '—')
 
   return (
     <ViewLayout titulo="Sensores" subtitulo="Datos en vivo · GET /api/sensores">
@@ -80,7 +102,7 @@ export default function SensoresView() {
                 <tr key={s.id ?? s._id ?? i} className="border-b border-white/5 last:border-0 hover:bg-white/5 transition">
                   <td className="px-5 py-4 text-sm text-white font-medium">{s.referencia ?? '—'}</td>
                   <td className="px-5 py-4 text-sm text-slate-300">{s.estado ?? '—'}</td>
-                  <td className="px-5 py-4 text-sm text-slate-400">{s.ubicacion_id ?? '—'}</td>
+                  <td className="px-5 py-4 text-sm text-slate-300">{nombreUbicacion(s)}</td>
                   <td className="px-5 py-4 text-sm text-slate-400">{s.notas ?? '—'}</td>
                 </tr>
               ))}
@@ -88,16 +110,6 @@ export default function SensoresView() {
           </table>
         )}
       </div>
-
-      {/* Pista para depurar la respuesta cruda del back (útil para Iván) */}
-      {estado === 'ok' && (
-        <details className="mt-4 text-sm text-slate-400">
-          <summary className="cursor-pointer hover:text-slate-200">Ver respuesta cruda (JSON)</summary>
-          <pre className="mt-2 max-h-72 overflow-auto rounded-xl border border-white/10 bg-slate-950 p-4 text-xs text-slate-300">
-            {JSON.stringify(sensores, null, 2)}
-          </pre>
-        </details>
-      )}
     </ViewLayout>
   )
 }
