@@ -1,7 +1,7 @@
 // Vista Museo (dashboard). Conectada a datos reales del back con fallback a demo.
 // Base de layout: rama andrea. Integración de datos: API real.
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { cargarDashboard } from '../api/dashboard.js'
 
 const MUSEOS_DATOS = {
@@ -184,37 +184,78 @@ function DashboardCargando() {
   )
 }
 
-// ── Selector de museo (dropdown) ────────────────────────────────────────────
-// Más limpio que las pills cuando hay muchos museos: un desplegable + la info
-// del museo activo (ciudad/país) y el contador de alertas.
+// ── Selector de museo (dropdown personalizado) ──────────────────────────────
+// Desplegable propio (no <select> nativo, que se ve mal en tema oscuro):
+// totalmente estilizado, con buscador-lista, alertas por museo y cierre al
+// hacer clic fuera o pulsar Escape.
 
 function SelectorMuseos({ lista, datos, activoId, onSelect, fuente }) {
+  const [abierto, setAbierto] = useState(false)
+  const ref = useRef(null)
   const museo = datos[activoId]
-  const alertCount = museo?.sensores?.filter(s => s.estado !== 'ÓPTIMO' && s.estado !== 'SIN DATOS').length ?? 0
+  const alertasDe = (id) =>
+    datos[id]?.sensores?.filter((s) => s.estado !== 'ÓPTIMO' && s.estado !== 'SIN DATOS').length ?? 0
+  const alertCount = alertasDe(activoId)
+
+  useEffect(() => {
+    const fuera = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setAbierto(false)
+    }
+    const esc = (e) => {
+      if (e.key === 'Escape') setAbierto(false)
+    }
+    document.addEventListener('mousedown', fuera)
+    document.addEventListener('keydown', esc)
+    return () => {
+      document.removeEventListener('mousedown', fuera)
+      document.removeEventListener('keydown', esc)
+    }
+  }, [])
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <label htmlFor="selector-museo" className="text-xs text-slate-500 uppercase tracking-widest">
-        Museo
-      </label>
+      <span className="text-xs text-slate-500 uppercase tracking-widest">Museo</span>
 
-      <div className="relative">
-        <select
-          id="selector-museo"
-          value={activoId ?? ''}
-          onChange={(e) => {
-            const v = e.target.value
-            onSelect(/^\d+$/.test(v) ? Number(v) : v)
-          }}
-          className="appearance-none rounded-xl border border-white/10 bg-slate-900 pl-4 pr-10 py-2 text-sm text-white outline-none focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/50 hover:bg-white/5 transition cursor-pointer"
+      <div className="relative" ref={ref}>
+        <button
+          type="button"
+          onClick={() => setAbierto((o) => !o)}
+          className="flex items-center justify-between gap-3 min-w-[220px] rounded-xl border border-white/10 bg-slate-900 pl-4 pr-3 py-2 text-sm text-white hover:bg-white/5 focus:border-cyan-400/50 outline-none transition"
         >
-          {lista.map((m) => (
-            <option key={m.id} value={m.id}>
-              {m.nombre}
-            </option>
-          ))}
-        </select>
-        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">▾</span>
+          <span className="truncate">{museo?.nombre ?? 'Selecciona un museo'}</span>
+          <span className={`text-slate-400 text-xs transition-transform ${abierto ? 'rotate-180' : ''}`}>▾</span>
+        </button>
+
+        {abierto && (
+          <div className="absolute left-0 z-30 mt-2 w-72 max-h-80 overflow-y-auto rounded-xl border border-white/10 bg-slate-900 p-1 shadow-2xl shadow-slate-950/60">
+            {lista.map((m) => {
+              const activo = String(activoId) === String(m.id)
+              const alertas = alertasDe(m.id)
+              return (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => {
+                    onSelect(m.id)
+                    setAbierto(false)
+                  }}
+                  className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm text-left transition ${
+                    activo
+                      ? 'bg-cyan-400/10 text-cyan-200 font-medium'
+                      : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <span className="truncate">{m.nombre}</span>
+                  {alertas > 0 && (
+                    <span className="flex-shrink-0 text-xs bg-orange-400/15 text-orange-300 rounded-full px-1.5 py-0.5 font-medium">
+                      {alertas}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       {museo?.ciudad && (
