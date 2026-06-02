@@ -1,7 +1,8 @@
-// Vista Museo — Sprint 1: layout y estructura, sin funcionalidad
-// Rama: andrea
+// Vista Museo (dashboard). Conectada a datos reales del back con fallback a demo.
+// Base de layout: rama andrea. Integración de datos: API real.
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { cargarDashboard } from '../api/dashboard.js'
 
 const MUSEOS_DATOS = {
   1: {
@@ -108,15 +109,36 @@ function claseEstado(estado) {
 // Vista de Museos (dashboard). Se renderiza dentro del AppLayout (que ya aporta
 // la sidebar global), por eso aquí solo va Header + selector de museo + contenido.
 export default function MuseumView() {
+  // Por defecto datos demo; si el back responde, se sustituyen por los reales.
+  const [datos, setDatos] = useState(MUSEOS_DATOS)
+  const [lista, setLista] = useState(museosMock)
   const [museoActivoId, setMuseoActivoId] = useState(1)
-  const museo = MUSEOS_DATOS[museoActivoId]
+  const [fuente, setFuente] = useState('demo') // demo | api
+
+  useEffect(() => {
+    let activo = true
+    cargarDashboard()
+      .then((res) => {
+        if (!activo || !res || !res.lista.length) return
+        setDatos(res.datos)
+        setLista(res.lista)
+        setMuseoActivoId(res.lista[0].id)
+        setFuente('api')
+      })
+      .catch(() => {}) // si el back falla, se queda el demo
+    return () => {
+      activo = false
+    }
+  }, [])
+
+  const museo = datos[museoActivoId] ?? Object.values(datos)[0]
 
   return (
     <>
       <Header museo={museo} />
       <div className="flex-1 overflow-y-auto bg-[#0f1117]">
         <div className="px-6 pt-6">
-          <SelectorMuseos activoId={museoActivoId} onSelect={setMuseoActivoId} />
+          <SelectorMuseos lista={lista} datos={datos} activoId={museoActivoId} onSelect={setMuseoActivoId} fuente={fuente} />
         </div>
         <ContenidoPrincipal museo={museo} key={museoActivoId} />
       </div>
@@ -128,13 +150,13 @@ export default function MuseumView() {
 // Sustituye al inventario que antes vivía en la sidebar interna. Cambia el
 // museo activo del dashboard sin salir de la vista.
 
-function SelectorMuseos({ activoId, onSelect }) {
+function SelectorMuseos({ lista, datos, activoId, onSelect, fuente }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <span className="text-xs text-slate-500 uppercase tracking-widest mr-1">Museo</span>
-      {museosMock.map(m => {
-        const datos      = MUSEOS_DATOS[m.id]
-        const alertCount = datos.sensores.filter(s => s.estado !== 'ÓPTIMO').length
+      {lista.map(m => {
+        const d          = datos[m.id]
+        const alertCount = d?.sensores?.filter(s => s.estado !== 'ÓPTIMO' && s.estado !== 'SIN DATOS').length ?? 0
         const activo     = activoId === m.id
         return (
           <button
@@ -155,6 +177,15 @@ function SelectorMuseos({ activoId, onSelect }) {
           </button>
         )
       })}
+      <span
+        className={`ml-2 text-xs rounded-full px-2 py-0.5 border ${
+          fuente === 'api'
+            ? 'border-green-400/30 bg-green-400/10 text-green-300'
+            : 'border-white/10 bg-white/5 text-slate-400'
+        }`}
+      >
+        {fuente === 'api' ? '● datos en vivo' : '○ datos demo'}
+      </span>
     </div>
   )
 }
