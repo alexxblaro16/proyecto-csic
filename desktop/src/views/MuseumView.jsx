@@ -1,92 +1,8 @@
-// Vista Museo (dashboard). Conectada a datos reales del back con fallback a demo.
-// Base de layout: rama andrea. Integración de datos: API real.
+// Vista de Monitorización (dashboard por ubicación). Datos SOLO reales del back.
+// Componentes de render basados en la rama andrea.
 
 import { useState, useEffect, useRef } from 'react'
 import { cargarDashboard } from '../api/dashboard.js'
-
-const MUSEOS_DATOS = {
-  1: {
-    nombre: 'Materioteca UDIT',
-    humedad: '43,9 %',
-    temperatura: '21,5° C',
-    phPromedio: 6.94,
-    ultimaActualizacion: '05/02/2026 · 14:32',
-    sensores: [
-      { id: 1, nombre: 'Vitrina 1', sala: 'Sala Antigua',    ph: 7.02, estado: 'ÓPTIMO',  ultimaLectura: '14:32' },
-      { id: 2, nombre: 'Vitrina 2', sala: 'Sala Antigua',    ph: 6.95, estado: 'ÓPTIMO',  ultimaLectura: '14:31' },
-      { id: 3, nombre: 'Vitrina 3', sala: 'Sala Central',    ph: 7.18, estado: 'ÓPTIMO',  ultimaLectura: '14:32' },
-      { id: 4, nombre: 'Vitrina 4', sala: 'Sala Central',    ph: 6.88, estado: 'ÓPTIMO',  ultimaLectura: '14:30' },
-      { id: 5, nombre: 'Vitrina 5', sala: 'Archivo Técnico', ph: 7.31, estado: 'ÓPTIMO',  ultimaLectura: '14:32' },
-      { id: 6, nombre: 'Vitrina 6', sala: 'Archivo Técnico', ph: 7.07, estado: 'ÓPTIMO',  ultimaLectura: '14:31' },
-      { id: 7, nombre: 'Vitrina 7', sala: 'Depósito',        ph: 6.76, estado: 'ÓPTIMO',  ultimaLectura: '14:32' },
-      { id: 8, nombre: 'Vitrina 8', sala: 'Depósito',        ph: 6.48, estado: 'ACÍDICO', ultimaLectura: '14:29' },
-      { id: 9, nombre: 'Vitrina 9', sala: 'Almacén B',       ph: 6.39, estado: 'ACÍDICO', ultimaLectura: '14:28' },
-    ],
-    notas: [
-      { id: 1, texto: 'Vitrina 8 y 9 fuera de rango — pH por debajo de 6,5. Revisar sellado con urgencia.', tipo: 'urgente', fecha: '05/02/2026' },
-      { id: 2, texto: 'Próxima medición programada: 15/03/2026. Coordinar con técnico de planta.', tipo: 'info', fecha: '05/02/2026' },
-      { id: 3, texto: 'Humedad estable en todos los materiales durante la última semana.', tipo: 'normal', fecha: '04/02/2026' },
-    ],
-  },
-  2: {
-    nombre: 'Inst. Historia CSIC',
-    humedad: '47,2 %',
-    temperatura: '20,1° C',
-    phPromedio: 7.22,
-    ultimaActualizacion: '05/02/2026 · 13:55',
-    sensores: [
-      { id: 1, nombre: 'Vitrina 1', sala: 'Sala Medieval',   ph: 7.05, estado: 'ÓPTIMO', ultimaLectura: '13:55' },
-      { id: 2, nombre: 'Vitrina 2', sala: 'Sala Medieval',   ph: 6.92, estado: 'ÓPTIMO', ultimaLectura: '13:54' },
-      { id: 3, nombre: 'Vitrina 3', sala: 'Sala Moderna',    ph: 7.44, estado: 'ÓPTIMO', ultimaLectura: '13:55' },
-      { id: 4, nombre: 'Vitrina 4', sala: 'Sala Moderna',    ph: 7.82, estado: 'BÁSICO', ultimaLectura: '13:52' },
-      { id: 5, nombre: 'Vitrina 5', sala: 'Archivo Central', ph: 6.98, estado: 'ÓPTIMO', ultimaLectura: '13:55' },
-      { id: 6, nombre: 'Vitrina 6', sala: 'Depósito Norte',  ph: 7.12, estado: 'ÓPTIMO', ultimaLectura: '13:53' },
-    ],
-    notas: [
-      { id: 1, texto: 'Vitrina 4 (Sala Moderna) con pH elevado: 7,82. Posible contaminación alcalina.', tipo: 'urgente', fecha: '05/02/2026' },
-      { id: 2, texto: 'Revisión programada sala medieval: 12/02/2026.', tipo: 'info', fecha: '04/02/2026' },
-    ],
-  },
-  3: {
-    nombre: 'Museo Arqueológico',
-    humedad: '52,0 %',
-    temperatura: '19,8° C',
-    phPromedio: 6.67,
-    ultimaActualizacion: '05/02/2026 · 12:10',
-    sensores: [
-      { id: 1, nombre: 'Vitrina 1', sala: 'Sala Ibérica', ph: 7.08, estado: 'ÓPTIMO',  ultimaLectura: '12:10' },
-      { id: 2, nombre: 'Vitrina 2', sala: 'Sala Romana',  ph: 6.74, estado: 'ÓPTIMO',  ultimaLectura: '12:09' },
-      { id: 3, nombre: 'Vitrina 3', sala: 'Sala Romana',  ph: 6.51, estado: 'ÓPTIMO',  ultimaLectura: '12:10' },
-      { id: 4, nombre: 'Vitrina 4', sala: 'Almacén',      ph: 6.35, estado: 'ACÍDICO', ultimaLectura: '12:05' },
-    ],
-    notas: [
-      { id: 1, texto: 'Vitrina 4 (Almacén) fuera de rango — pH: 6,35. Revisar con urgencia.', tipo: 'urgente', fecha: '05/02/2026' },
-      { id: 2, texto: 'Alta humedad (52 %). Supervisar condensación en vitrinas de sala romana.', tipo: 'normal', fecha: '04/02/2026' },
-    ],
-  },
-  4: {
-    nombre: 'Fondo Documental',
-    humedad: '41,5 %',
-    temperatura: '22,0° C',
-    phPromedio: 7.02,
-    ultimaActualizacion: '05/02/2026 · 11:45',
-    sensores: [
-      { id: 1, nombre: 'Sensor 1', sala: 'Sala A', ph: 7.15, estado: 'ÓPTIMO', ultimaLectura: '11:45' },
-      { id: 2, nombre: 'Sensor 2', sala: 'Sala A', ph: 7.03, estado: 'ÓPTIMO', ultimaLectura: '11:44' },
-      { id: 3, nombre: 'Sensor 3', sala: 'Sala B', ph: 6.88, estado: 'ÓPTIMO', ultimaLectura: '11:45' },
-    ],
-    notas: [
-      { id: 1, texto: 'Todos los sensores en rango. Revisión trimestral: 20/05/2026.', tipo: 'info', fecha: '05/02/2026' },
-    ],
-  },
-}
-
-const museosMock = [
-  { id: 1, nombre: 'Materioteca UDIT' },
-  { id: 2, nombre: 'Inst. Historia CSIC' },
-  { id: 3, nombre: 'Museo Arqueológico' },
-  { id: 4, nombre: 'Fondo Documental' },
-]
 
 const ESTADO_CLASES = {
   ÓPTIMO:  { badge: 'bg-green-400/10 text-green-300 border-green-400/20',   punto: 'bg-green-400'  },
@@ -112,17 +28,11 @@ export default function MuseumView() {
   const [datos, setDatos] = useState(null)
   const [lista, setLista] = useState([])
   const [museoActivoId, setMuseoActivoId] = useState(null)
-  const [fuente, setFuente] = useState('demo') // demo | api
   const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     let activo = true
-    const usarDemo = () => {
-      setDatos(MUSEOS_DATOS)
-      setLista(museosMock)
-      setMuseoActivoId(museosMock[0].id)
-      setFuente('demo')
-    }
     cargarDashboard()
       .then((res) => {
         if (!activo) return
@@ -130,13 +40,10 @@ export default function MuseumView() {
           setDatos(res.datos)
           setLista(res.lista)
           setMuseoActivoId(res.lista[0].id)
-          setFuente('api')
-        } else {
-          usarDemo()
         }
       })
       .catch(() => {
-        if (activo) usarDemo()
+        if (activo) setError(true)
       })
       .finally(() => {
         if (activo) setCargando(false)
@@ -146,10 +53,9 @@ export default function MuseumView() {
     }
   }, [])
 
-  // Mientras cargan los datos no mostramos un museo "de relleno": estado de carga.
-  if (cargando || !datos) {
-    return <DashboardCargando />
-  }
+  if (cargando) return <DashboardCargando />
+  // Solo datos reales: si el back no responde o no hay ubicaciones, estado vacío (sin demo).
+  if (error || !datos || !lista.length) return <DashboardVacio error={error} />
 
   const museo = datos[museoActivoId] ?? Object.values(datos)[0]
 
@@ -158,9 +64,33 @@ export default function MuseumView() {
       <Header museo={museo} />
       <div className="flex-1 overflow-y-auto bg-[#0f1117]">
         <div className="px-6 pt-6">
-          <SelectorMuseos lista={lista} datos={datos} activoId={museoActivoId} onSelect={setMuseoActivoId} fuente={fuente} />
+          <SelectorMuseos lista={lista} datos={datos} activoId={museoActivoId} onSelect={setMuseoActivoId} />
         </div>
         <ContenidoPrincipal museo={museo} key={museoActivoId} />
+      </div>
+    </>
+  )
+}
+
+// ── Estado vacío / error ────────────────────────────────────────────────────
+
+function DashboardVacio({ error }) {
+  return (
+    <>
+      <header className="h-14 border-b border-white/5 flex items-center px-6 bg-slate-950 flex-shrink-0">
+        <span className="text-sm font-semibold text-white">Monitorización</span>
+      </header>
+      <div className="flex-1 flex items-center justify-center bg-[#0f1117]">
+        <div className="text-center max-w-sm">
+          <p className="text-slate-300 font-medium">
+            {error ? 'No se pudo conectar con el back' : 'No hay ubicaciones con datos'}
+          </p>
+          <p className="text-sm text-slate-500 mt-2">
+            {error
+              ? 'Comprueba que la API esté levantada en localhost:8180 (docker compose up).'
+              : 'Cuando el back tenga ubicaciones y sensores, aparecerán aquí.'}
+          </p>
+        </div>
       </div>
     </>
   )
@@ -189,7 +119,7 @@ function DashboardCargando() {
 // totalmente estilizado, con buscador-lista, alertas por museo y cierre al
 // hacer clic fuera o pulsar Escape.
 
-function SelectorMuseos({ lista, datos, activoId, onSelect, fuente }) {
+function SelectorMuseos({ lista, datos, activoId, onSelect }) {
   const [abierto, setAbierto] = useState(false)
   const ref = useRef(null)
   const museo = datos[activoId]
@@ -271,14 +201,8 @@ function SelectorMuseos({ lista, datos, activoId, onSelect, fuente }) {
         </span>
       )}
 
-      <span
-        className={`ml-auto text-xs rounded-full px-2 py-0.5 border ${
-          fuente === 'api'
-            ? 'border-green-400/30 bg-green-400/10 text-green-300'
-            : 'border-white/10 bg-white/5 text-slate-400'
-        }`}
-      >
-        {fuente === 'api' ? '● datos en vivo' : '○ datos demo'}
+      <span className="ml-auto text-xs rounded-full px-2 py-0.5 border border-green-400/30 bg-green-400/10 text-green-300">
+        ● en vivo
       </span>
     </div>
   )
