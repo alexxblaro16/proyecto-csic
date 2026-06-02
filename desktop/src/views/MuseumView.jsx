@@ -105,100 +105,57 @@ function claseEstado(estado) {
 
 // ── Raíz ──────────────────────────────────────────────────────────────────────
 
+// Vista de Museos (dashboard). Se renderiza dentro del AppLayout (que ya aporta
+// la sidebar global), por eso aquí solo va Header + selector de museo + contenido.
 export default function MuseumView() {
   const [museoActivoId, setMuseoActivoId] = useState(1)
   const museo = MUSEOS_DATOS[museoActivoId]
 
   return (
-    <div className="flex h-screen bg-slate-950 text-white overflow-hidden">
-      <Sidebar museoActivoId={museoActivoId} onSelectMuseo={setMuseoActivoId} />
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Header museo={museo} />
+    <>
+      <Header museo={museo} />
+      <div className="flex-1 overflow-y-auto bg-[#0f1117]">
+        <div className="px-6 pt-6">
+          <SelectorMuseos activoId={museoActivoId} onSelect={setMuseoActivoId} />
+        </div>
         <ContenidoPrincipal museo={museo} key={museoActivoId} />
       </div>
+    </>
+  )
+}
+
+// ── Selector de museo (pills) ───────────────────────────────────────────────
+// Sustituye al inventario que antes vivía en la sidebar interna. Cambia el
+// museo activo del dashboard sin salir de la vista.
+
+function SelectorMuseos({ activoId, onSelect }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="text-xs text-slate-500 uppercase tracking-widest mr-1">Museo</span>
+      {museosMock.map(m => {
+        const datos      = MUSEOS_DATOS[m.id]
+        const alertCount = datos.sensores.filter(s => s.estado !== 'ÓPTIMO').length
+        const activo     = activoId === m.id
+        return (
+          <button
+            key={m.id}
+            onClick={() => onSelect(m.id)}
+            className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm transition ${
+              activo
+                ? 'border-cyan-400/40 bg-cyan-400/10 text-cyan-200 font-medium'
+                : 'border-white/10 bg-slate-900 text-slate-300 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            {m.nombre}
+            {alertCount > 0 && (
+              <span className="text-xs bg-orange-400/15 text-orange-300 rounded-full px-1.5 py-0.5 font-medium">
+                {alertCount}
+              </span>
+            )}
+          </button>
+        )
+      })}
     </div>
-  )
-}
-
-// ── Sidebar ───────────────────────────────────────────────────────────────────
-
-function Sidebar({ museoActivoId, onSelectMuseo }) {
-  return (
-    <aside className="w-64 flex-shrink-0 flex flex-col border-r border-white/5 bg-slate-950">
-      <div className="p-5 border-b border-white/5">
-        <LogoApp />
-      </div>
-
-      <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-        <ElementoNav label="Museos" activo />
-        <ElementoNav label="Sensores" />
-        <ElementoNav label="Analítica" />
-        <ElementoNav label="Alertas" />
-
-        <div className="pt-5">
-          <p className="text-xs text-slate-500 uppercase tracking-widest px-3 mb-1">Inventario</p>
-          {museosMock.map(m => {
-            const datos      = MUSEOS_DATOS[m.id]
-            const alertCount = datos.sensores.filter(s => s.estado !== 'ÓPTIMO').length
-            return (
-              <button
-                key={m.id}
-                onClick={() => onSelectMuseo(m.id)}
-                className={`w-full text-left px-3 py-2.5 text-sm rounded-lg transition flex items-center justify-between ${
-                  museoActivoId === m.id
-                    ? 'bg-white/10 text-white font-medium'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <span className="truncate">{m.nombre}</span>
-                {alertCount > 0 && (
-                  <span className="ml-2 flex-shrink-0 text-xs bg-orange-400/15 text-orange-300 rounded-full px-1.5 py-0.5 font-medium">
-                    {alertCount}
-                  </span>
-                )}
-              </button>
-            )
-          })}
-        </div>
-      </nav>
-
-      <div className="p-3 border-t border-white/5 space-y-0.5">
-        <button className="w-full bg-cyan-400 text-slate-950 text-sm font-semibold py-2 rounded-lg hover:bg-cyan-300 transition mb-2">
-          + Añadir museo
-        </button>
-        <ElementoNav label="Configuración" />
-        <ElementoNav label="Soporte" />
-      </div>
-    </aside>
-  )
-}
-
-function LogoApp() {
-  return (
-    <div className="flex items-center gap-2.5">
-      <div className="w-9 h-9 rounded-lg bg-cyan-400/10 border border-cyan-400/30 flex items-center justify-center flex-shrink-0">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <circle cx="9" cy="9" r="7.5" stroke="#22d3ee" strokeWidth="1.2" />
-          <text x="9" y="13" textAnchor="middle" fontSize="7" fontWeight="700" fill="#22d3ee" fontFamily="monospace">pH</text>
-        </svg>
-      </div>
-      <div>
-        <p className="text-sm font-bold text-white leading-tight">VirtualpH</p>
-        <p className="text-xs text-slate-400 leading-tight">Monitor CSIC</p>
-      </div>
-    </div>
-  )
-}
-
-function ElementoNav({ label, activo }) {
-  return (
-    <button
-      className={`w-full text-left px-3 py-2.5 text-sm rounded-lg transition ${
-        activo ? 'bg-white/10 text-white font-medium' : 'text-slate-300 hover:text-white hover:bg-white/5'
-      }`}
-    >
-      {label}
-    </button>
   )
 }
 
@@ -240,7 +197,6 @@ function ContenidoPrincipal({ museo }) {
     : '100,0'
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#0f1117]">
       <div className="p-6 space-y-5">
 
         <div className="flex items-end justify-between">
@@ -288,7 +244,6 @@ function ContenidoPrincipal({ museo }) {
         </div>
 
       </div>
-    </div>
   )
 }
 
