@@ -282,7 +282,7 @@ function ContenidoPrincipal({ museo }) {
 
 function BannerAlertas({ alertas }) {
   return (
-    <div className="rounded-xl border border-orange-400/20 bg-orange-400/5 p-4 flex items-start gap-3">
+    <div className="rounded-2xl border border-orange-400/20 bg-orange-400/5 p-4 flex items-start gap-3">
       <div className="w-8 h-8 rounded-lg bg-orange-400/10 flex items-center justify-center flex-shrink-0 mt-0.5">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path d="M8 2L14 13H2L8 2Z" stroke="#fb923c" strokeWidth="1.3" strokeLinejoin="round" />
@@ -311,7 +311,7 @@ function BannerAlertas({ alertas }) {
 
 function TarjetaMetrica({ etiqueta, valor, sub, colorSub, bordeAlerta }) {
   return (
-    <div className={`rounded-xl border bg-slate-900 p-5 ${bordeAlerta ? 'border-orange-400/20' : 'border-white/10'}`}>
+    <div className={`rounded-2xl border bg-slate-900 p-5 ${bordeAlerta ? 'border-orange-400/20' : 'border-white/10'}`}>
       <p className="text-sm text-slate-400 uppercase tracking-widest mb-3">{etiqueta}</p>
       <p className="text-3xl font-bold text-white">{valor}</p>
       {sub && <p className={`text-sm mt-2 ${colorSub}`}>{sub}</p>}
@@ -321,7 +321,7 @@ function TarjetaMetrica({ etiqueta, valor, sub, colorSub, bordeAlerta }) {
 
 function TarjetaAtmosferica({ museo }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-slate-900 p-5">
+    <div className="rounded-2xl border border-white/10 bg-slate-900 p-5">
       <p className="text-sm text-slate-400 uppercase tracking-widest mb-3">Condiciones</p>
       <div className="grid grid-cols-2 gap-3">
         <div>
@@ -341,7 +341,7 @@ function TarjetaAtmosferica({ museo }) {
 
 function TablaSensores({ sensores, nombreMuseo }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-slate-900 overflow-hidden">
+    <div className="rounded-2xl border border-white/10 bg-slate-900 overflow-hidden">
       <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
         <h2 className="font-semibold text-white">Tabla de sensores</h2>
         <span className="text-sm text-slate-400">{sensores.length} sensores</span>
@@ -433,7 +433,7 @@ function BarraPH({ ph, estado, ancho = 'w-24' }) {
 
 function PanelNotas({ notas, nombreMuseo }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-slate-900 flex flex-col">
+    <div className="rounded-2xl border border-white/10 bg-slate-900 flex flex-col">
       <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
         <div>
           <h2 className="font-semibold text-white">Notas</h2>

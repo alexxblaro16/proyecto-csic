@@ -26,7 +26,7 @@ export default function AnaliticaView() {
 
   return (
     <ViewLayout titulo="Analítica" subtitulo="Evolución del pH">
-      <div className="rounded-3xl border border-white/10 bg-slate-900/80 p-4">
+      <div className="rounded-2xl border border-white/10 bg-slate-900 p-4">
         {/* Si serie está vacía, GraficaPH cae a su mock automáticamente */}
         <GraficaPH datos={serie} subtitulo={subtitulo} />
       </div>

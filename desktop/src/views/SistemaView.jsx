@@ -31,7 +31,7 @@ export default function SistemaView() {
   return (
     <ViewLayout titulo="Sistema" subtitulo="Estado y diagnóstico">
       <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        <section className="rounded-3xl border border-white/10 bg-slate-900/80 p-5">
+        <section className="rounded-2xl border border-white/10 bg-slate-900 p-5">
           <div className="mb-4 flex items-center justify-between gap-4">
             <div>
               <h2 className="text-xl font-semibold text-white">Comprobación de la API</h2>
@@ -55,7 +55,7 @@ export default function SistemaView() {
           </div>
         </section>
 
-        <section className="overflow-hidden rounded-3xl border border-white/10 bg-slate-900/80 p-4">
+        <section className="overflow-hidden rounded-2xl border border-white/10 bg-slate-900 p-4">
           <div className="mb-4">
             <h2 className="text-2xl font-semibold text-white">Vista 3D</h2>
             <p className="text-sm text-slate-400">Doble clic para crear, clic para inspeccionar.</p>

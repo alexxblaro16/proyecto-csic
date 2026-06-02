@@ -81,7 +81,7 @@ export default function AlertasView() {
         )}
 
         {estado === 'error' && (
-          <div className="m-4 rounded-xl border border-orange-400/30 bg-orange-400/10 px-4 py-3 text-sm text-orange-200">
+          <div className="m-4 rounded-2xl border border-orange-400/30 bg-orange-400/10 px-4 py-3 text-sm text-orange-200">
             No se pudo cargar: {error}
             <p className="text-orange-300/70 mt-1">
               ¿Está el back levantado en <span className="font-mono">localhost:8180</span>?

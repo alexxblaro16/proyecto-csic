@@ -33,7 +33,7 @@ const CreateMuseumForm = () => {
   }
 
   return (
-    <section className="rounded-3xl border border-white/10 bg-slate-900/80 p-6 shadow-xl">
+    <section className="rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-xl">
       <div className="mb-6">
         <h2 className="text-2xl font-semibold text-white">Crear Nuevo Museo</h2>
         <p className="text-sm text-slate-400">Introduce los datos básicos para el registro en el sistema.</p>
