@@ -5,6 +5,7 @@
 import { useEffect, useState } from 'react'
 import ViewLayout from '../components/ViewLayout.jsx'
 import Sensor360Modal from '../components/Sensor360Modal.jsx'
+import SensorDetalleModal from '../components/SensorDetalleModal.jsx'
 import { sensores as apiSensores, ubicaciones as apiUbicaciones } from '../api/index.js'
 
 const aLista = (r) => (Array.isArray(r) ? r : r?.data ?? [])
@@ -42,6 +43,7 @@ export default function SensoresView() {
   const [estado, setEstado] = useState('cargando') // cargando | ok | error
   const [error, setError] = useState('')
   const [sensorActivo, setSensorActivo] = useState(null) // sensor del modal 360
+  const [sensorDetalle, setSensorDetalle] = useState(null) // sensor del modal detalle
 
   const cargar = async () => {
     setEstado('cargando')
@@ -140,7 +142,12 @@ export default function SensoresView() {
             </thead>
             <tbody>
               {sensores.map((s, i) => (
-                <tr key={s.id ?? s._id ?? i} className="border-b border-white/5 last:border-0 hover:bg-white/5 transition">
+                <tr
+                  key={s.id ?? s._id ?? i}
+                  onClick={() => setSensorDetalle(s)}
+                  className="border-b border-white/5 last:border-0 hover:bg-white/5 transition cursor-pointer"
+                  title="Ver detalle del sensor"
+                >
                   <td className="px-5 py-4">
                     <span className={`inline-flex items-center gap-1.5 text-sm font-medium px-2.5 py-0.5 rounded-full border ${badgeEstado(s.estado)}`}>
                       <span className={`w-2 h-2 rounded-full ${puntoEstado(s.estado)}`} />
@@ -155,7 +162,10 @@ export default function SensoresView() {
                   <td className="px-5 py-4 text-sm text-slate-400">{s.notas ?? '—'}</td>
                   <td className="px-5 py-4 text-right">
                     <button
-                      onClick={() => setSensorActivo(s)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setSensorActivo(s)
+                      }}
                       title="Ver en 360"
                       aria-label="Ver en 360"
                       className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-cyan-400/30 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/20 transition"
@@ -170,7 +180,16 @@ export default function SensoresView() {
         )}
       </div>
 
-      {/* Modal 360 encima de la vista de Sensores */}
+      {/* Modal de detalle del sensor (clic en la fila) */}
+      {sensorDetalle && (
+        <SensorDetalleModal
+          sensor={sensorDetalle}
+          ubicacion={nombreUbicacion(sensorDetalle)}
+          onClose={() => setSensorDetalle(null)}
+        />
+      )}
+
+      {/* Modal 360 (botón de cámara) */}
       {sensorActivo && (
         <Sensor360Modal
           sensor={sensorActivo}
