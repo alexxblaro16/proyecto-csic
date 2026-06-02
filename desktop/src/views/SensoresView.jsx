@@ -4,9 +4,19 @@
 // sensores por referencia y su nombre está en el campo 'notas').
 import { useEffect, useState } from 'react'
 import ViewLayout from '../components/ViewLayout.jsx'
+import Sensor360Modal from '../components/Sensor360Modal.jsx'
 import { sensores as apiSensores, ubicaciones as apiUbicaciones } from '../api/index.js'
 
 const aLista = (r) => (Array.isArray(r) ? r : r?.data ?? [])
+
+function IconoCamara() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 18 18" fill="none">
+      <path d="M2 5.5h2.2l1-1.5h3.6l1 1.5H16v9H2v-9Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+      <circle cx="9" cy="10" r="2.6" stroke="currentColor" strokeWidth="1.3" />
+    </svg>
+  )
+}
 
 const badgeEstado = (estado = '') => {
   const v = estado.toLowerCase()
@@ -31,6 +41,7 @@ export default function SensoresView() {
   const [ubicacionPorRef, setUbicacionPorRef] = useState({})
   const [estado, setEstado] = useState('cargando') // cargando | ok | error
   const [error, setError] = useState('')
+  const [sensorActivo, setSensorActivo] = useState(null) // sensor del modal 360
 
   const cargar = async () => {
     setEstado('cargando')
@@ -102,7 +113,7 @@ export default function SensoresView() {
         )}
 
         {estado === 'error' && (
-          <div className="m-4 rounded-xl border border-orange-400/30 bg-orange-400/10 px-4 py-3 text-sm text-orange-200">
+          <div className="m-4 rounded-2xl border border-orange-400/30 bg-orange-400/10 px-4 py-3 text-sm text-orange-200">
             No se pudo cargar: {error}
             <p className="text-orange-300/70 mt-1">
               ¿Está el back levantado en <span className="font-mono">localhost:8180</span>? (docker compose up)
@@ -124,6 +135,7 @@ export default function SensoresView() {
                 <th className="text-left px-5 py-3 text-sm text-slate-400 font-medium">Referencia</th>
                 <th className="text-left px-5 py-3 text-sm text-slate-400 font-medium">Ubicación</th>
                 <th className="text-left px-5 py-3 text-sm text-slate-400 font-medium">Notas</th>
+                <th className="text-right px-5 py-3 text-sm text-slate-400 font-medium">360</th>
               </tr>
             </thead>
             <tbody>
@@ -141,19 +153,38 @@ export default function SensoresView() {
                     {nombreUbicacion(s)}
                   </td>
                   <td className="px-5 py-4 text-sm text-slate-400">{s.notas ?? '—'}</td>
+                  <td className="px-5 py-4 text-right">
+                    <button
+                      onClick={() => setSensorActivo(s)}
+                      title="Ver en 360"
+                      aria-label="Ver en 360"
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-cyan-400/30 bg-cyan-400/10 text-cyan-300 hover:bg-cyan-400/20 transition"
+                    >
+                      <IconoCamara />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         )}
       </div>
+
+      {/* Modal 360 encima de la vista de Sensores */}
+      {sensorActivo && (
+        <Sensor360Modal
+          sensor={sensorActivo}
+          ubicacion={nombreUbicacion(sensorActivo)}
+          onClose={() => setSensorActivo(null)}
+        />
+      )}
     </ViewLayout>
   )
 }
 
 function Metrica({ etiqueta, valor, color = 'text-white' }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-slate-900 p-4">
+    <div className="rounded-2xl border border-white/10 bg-slate-900 p-4">
       <p className="text-sm text-slate-400 uppercase tracking-widest mb-2">{etiqueta}</p>
       <p className={`text-2xl font-bold ${color}`}>{valor}</p>
     </div>
