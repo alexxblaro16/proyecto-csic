@@ -18,12 +18,13 @@ export function estadoPorPh(ph) {
   return 'ÓPTIMO'
 }
 
-// "Museo del Prado" -> "PRADO" (última palabra significativa, sin tildes)
-function tokenMuseo(nombre = '') {
+// "Museo Thyssen-Bornemisza" -> ['THYSSEN','BORNEMISZA'] (palabras significativas,
+// sin tildes). Un sensor pertenece al museo si su referencia contiene ALGUNA de
+// ellas (SENSOR-THYSSEN-001, SENSOR-RSOFIA-001 -> SOFIA, etc.).
+function tokensMuseo(nombre = '') {
   const limpio = nombre.toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
-  const stop = new Set(['MUSEO', 'DEL', 'DE', 'LA', 'EL', 'LOS', 'NACIONAL', 'CENTRO', 'ARTE', 'Y'])
-  const palabras = limpio.split(/[^A-Z]+/).filter((p) => p && !stop.has(p))
-  return palabras[palabras.length - 1] || limpio
+  const stop = new Set(['MUSEO', 'DEL', 'DE', 'LA', 'EL', 'LOS', 'NACIONAL', 'CENTRO', 'ARTE', 'Y', 'CONTEMPORANEO'])
+  return limpio.split(/[^A-Z]+/).filter((p) => p.length >= 4 && !stop.has(p))
 }
 
 const horaDe = (fecha) => {
@@ -57,8 +58,11 @@ export async function cargarDashboard() {
   const lista = []
 
   for (const mu of museosL) {
-    const token = tokenMuseo(mu.nombre)
-    const propios = sensL.filter((s) => (s.referencia || '').toUpperCase().includes(token))
+    const tokens = tokensMuseo(mu.nombre)
+    const propios = sensL.filter((s) => {
+      const ref = (s.referencia || '').toUpperCase()
+      return tokens.some((t) => ref.includes(t))
+    })
 
     const sens = propios.map((s) => {
       const med = ultima[s.id]
