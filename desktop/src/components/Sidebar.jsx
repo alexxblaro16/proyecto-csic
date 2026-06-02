@@ -2,7 +2,7 @@
 // Extraída de la MuseumView original para que TODAS las vistas compartan el
 // mismo chrome y cada enlace lleve a una ruta independiente.
 import { NavLink, useNavigate } from 'react-router-dom'
-import { logout } from '../auth.js'
+import { logout, usuarioActual } from '../auth.js'
 
 const NAV = [
   { to: '/museos', label: 'Museos' },
@@ -17,6 +17,7 @@ const NAV_INFERIOR = [
 
 export default function Sidebar() {
   const navigate = useNavigate()
+  const user = usuarioActual()
 
   const cerrarSesion = () => {
     logout()
@@ -45,6 +46,17 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-3 border-t border-white/5 space-y-0.5">
+        {user && (
+          <div className="flex items-center gap-2.5 px-3 py-2 mb-1">
+            <div className="w-8 h-8 rounded-full bg-cyan-400/15 border border-cyan-400/30 flex items-center justify-center text-cyan-300 font-bold text-sm flex-shrink-0">
+              {(user.name || 'U').trim().charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm text-white font-medium truncate">{user.name}</p>
+              <p className="text-xs text-slate-400 truncate">{user.email}</p>
+            </div>
+          </div>
+        )}
         {NAV_INFERIOR.map((item) => (
           <EnlaceNav key={item.to} to={item.to} label={item.label} />
         ))}

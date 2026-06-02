@@ -97,6 +97,10 @@ export default function LoginView() {
               {cargando ? 'Entrando…' : 'Iniciar sesión'}
             </button>
           </form>
+
+          <div className="mt-5 rounded-xl border border-white/10 bg-slate-950/60 px-4 py-2.5 text-center text-xs text-slate-400">
+            Demo: <span className="text-cyan-300 font-medium">admin@csic.es</span> / <span className="text-cyan-300 font-medium">password</span>
+          </div>
         </div>
 
         <p className="mt-6 text-center text-xs text-slate-500">

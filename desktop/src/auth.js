@@ -1,25 +1,51 @@
-// Capa de autenticación mínima del front.
-// De momento es un mock local (guarda un flag en localStorage) porque el back
-// todavía no expone /api/login. Cuando Iván tenga el endpoint de Sanctum,
-// se sustituye loginRequest() por la llamada real y se guarda el token.
+// Capa de autenticación del front — CONECTADA al back real (Sanctum).
+// POST /api/login devuelve un token; se guarda en localStorage y el cliente
+// (src/api/client.js) lo envía como Bearer en cada petición.
+import { api } from './api/client.js'
 
-const CLAVE = 'virtualph_auth'
+const TOKEN = 'virtualph_token'
+const USER = 'virtualph_user'
 
-export function estaAutenticado() {
-  return localStorage.getItem(CLAVE) === 'true'
+export function getToken() {
+  return localStorage.getItem(TOKEN)
 }
 
-// TODO (integración back): reemplazar por
-//   POST {API}/login -> { token }  y guardar el token (Sanctum).
+export function estaAutenticado() {
+  return !!localStorage.getItem(TOKEN)
+}
+
+export function usuarioActual() {
+  try {
+    return JSON.parse(localStorage.getItem(USER))
+  } catch {
+    return null
+  }
+}
+
 export async function loginRequest(email, password) {
-  // Validación mínima en cliente mientras no hay back de auth.
   if (!email || !password) {
     throw new Error('Introduce email y contraseña.')
   }
-  localStorage.setItem(CLAVE, 'true')
-  return { ok: true }
+  const res = await api.post('/login', { email, password })
+  if (!res?.token) {
+    throw new Error('Respuesta de login inesperada.')
+  }
+  localStorage.setItem(TOKEN, res.token)
+  if (res.user) localStorage.setItem(USER, JSON.stringify(res.user))
+  return res
 }
 
-export function logout() {
-  localStorage.removeItem(CLAVE)
+export async function logout() {
+  const token = localStorage.getItem(TOKEN)
+  // Limpia local primero para que la UI reaccione al instante.
+  localStorage.removeItem(TOKEN)
+  localStorage.removeItem(USER)
+  // Revoca el token en el back (best-effort).
+  if (token) {
+    try {
+      await api.post('/logout')
+    } catch {
+      /* da igual si falla: el token local ya está borrado */
+    }
+  }
 }

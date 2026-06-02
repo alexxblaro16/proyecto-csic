@@ -4,12 +4,24 @@
 
 export const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8180/api'
 
+// Token de sesión (Sanctum). Se lee directo de localStorage para no acoplar
+// el cliente con la capa de auth.
+function getToken() {
+  try {
+    return localStorage.getItem('virtualph_token')
+  } catch {
+    return null
+  }
+}
+
 async function request(path, { method = 'GET', body, headers } = {}) {
+  const token = getToken()
   const res = await fetch(`${API_URL}${path}`, {
     method,
     headers: {
       Accept: 'application/json',
       ...(body ? { 'Content-Type': 'application/json' } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...headers,
     },
     body: body ? JSON.stringify(body) : undefined,

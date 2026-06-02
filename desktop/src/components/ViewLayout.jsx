@@ -1,7 +1,11 @@
 // Cabecera + cuerpo scrollable reutilizable para las vistas que no son el
 // dashboard de museos. Mantiene el mismo estilo (header de 56px, fondo #0f1117).
+import { usuarioActual } from '../auth.js'
 
 export default function ViewLayout({ titulo, subtitulo, children }) {
+  const user = usuarioActual()
+  const inicial = (user?.name || 'U').trim().charAt(0).toUpperCase()
+
   return (
     <>
       <header className="h-14 border-b border-white/5 flex items-center justify-between px-6 bg-slate-950 flex-shrink-0">
@@ -14,8 +18,11 @@ export default function ViewLayout({ titulo, subtitulo, children }) {
             </>
           )}
         </div>
-        <div className="w-8 h-8 rounded-full bg-cyan-400 flex items-center justify-center text-slate-950 font-bold text-sm select-none">
-          A
+        <div
+          title={user?.email || ''}
+          className="w-8 h-8 rounded-full bg-cyan-400 flex items-center justify-center text-slate-950 font-bold text-sm select-none"
+        >
+          {inicial}
         </div>
       </header>
       <div className="flex-1 overflow-y-auto bg-[#0f1117]">
