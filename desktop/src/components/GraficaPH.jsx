@@ -18,7 +18,7 @@ import {
 // DATOS: los niveles de pH hora por hora
 // Si quieres cambiar un valor, cambia el número de "ph"
 // ─────────────────────────────────────────
-const datos = [
+const datosMock = [
   { hora: "00:00", ph: 7.10 },
   { hora: "01:00", ph: 7.08 },
   { hora: "02:00", ph: 7.05 },
@@ -76,7 +76,10 @@ function Globito({ active, payload, label }) {
 // LA GRÁFICA
 // Esta es la parte que se ve en pantalla
 // ─────────────────────────────────────────
-export default function GraficaPH() {
+export default function GraficaPH({ datos, subtitulo } = {}) {
+  // Si llegan datos reales por props se usan; si no, cae al mock de prueba.
+  const serie = datos && datos.length ? datos : datosMock
+
   return (
     <div style={{
       background: "#0f172a",
@@ -87,12 +90,12 @@ export default function GraficaPH() {
 
       {/* Título arriba */}
       <h2 style={{ color: "white", fontSize: "16px", margin: "0 0 4px 0" }}>
-        Evolución del pH — últimas 24 horas
+        Evolución del pH
       </h2>
 
-      {/* Aviso de que los datos son de prueba */}
+      {/* Subtítulo: real o de prueba */}
       <p style={{ color: "#64748b", fontSize: "14px", margin: "0 0 16px 0" }}>
-        Datos de prueba — sensor no conectado
+        {subtitulo ?? "Datos de prueba — sensor no conectado"}
       </p>
 
       {/* Leyenda: qué significa cada línea de color */}
@@ -107,7 +110,7 @@ export default function GraficaPH() {
 
       {/* La gráfica — se adapta al ancho de la pantalla */}
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={datos} margin={{ top: 8, right: 20, left: 0, bottom: 8 }}>
+        <LineChart data={serie} margin={{ top: 8, right: 20, left: 0, bottom: 8 }}>
 
           {/* Líneas de fondo */}
           <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
