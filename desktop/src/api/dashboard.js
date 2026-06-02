@@ -1,16 +1,16 @@
-// Capa de datos del dashboard: combina museos + sensores + mediciones reales
-// del back y los deja en la forma que espera la MuseumView.
-//
-// Nota del modelo real: el back no expone el enlace museo->sensor de forma
-// directa (sensores son SQL con ubicacion_id; /api/ubicaciones es Mongo sin
-// museo_id). Los sensores sembrados siguen el patrón SENSOR-<MUSEO>-NNN, así
-// que asociamos cada sensor a su museo por el token del nombre (ej. PRADO).
-import { museos, sensores, mediciones } from './index.js'
+// Capa de datos del dashboard — SOLO con relaciones reales que expone el back.
+// El back NO da el link museo->sensor, así que el dashboard se organiza por
+// UBICACIÓN, que sí tiene links reales:
+//   - ubicacion.sensores[].referencia  <->  sensor.referencia   (lo da /api/ubicaciones)
+//   - medicion.sensor_id               <->  sensor.id           (lo da /api/mediciones)
+import { ubicaciones, sensores, mediciones } from './index.js'
 
 const aLista = (r) => (Array.isArray(r) ? r : r?.data ?? [])
 const aNum = (v) => (v == null || v === '' ? null : Number(v))
+const idDe = (o) => o?.id ?? o?._id
 
-// Rango objetivo de pH: 6,5 – 7,5
+// Clasificación de pH para mostrar (rango objetivo 6,5 – 7,5). Es presentación
+// del valor real, no un dato inventado.
 export function estadoPorPh(ph) {
   if (ph == null) return 'SIN DATOS'
   if (ph < 6.5) return 'ACÍDICO'
@@ -18,36 +18,30 @@ export function estadoPorPh(ph) {
   return 'ÓPTIMO'
 }
 
-// "Museo Thyssen-Bornemisza" -> ['THYSSEN','BORNEMISZA'] (palabras significativas,
-// sin tildes). Un sensor pertenece al museo si su referencia contiene ALGUNA de
-// ellas (SENSOR-THYSSEN-001, SENSOR-RSOFIA-001 -> SOFIA, etc.).
-function tokensMuseo(nombre = '') {
-  const limpio = nombre.toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
-  const stop = new Set(['MUSEO', 'DEL', 'DE', 'LA', 'EL', 'LOS', 'NACIONAL', 'CENTRO', 'ARTE', 'Y', 'CONTEMPORANEO'])
-  return limpio.split(/[^A-Z]+/).filter((p) => p.length >= 4 && !stop.has(p))
-}
-
 const horaDe = (fecha) => {
   if (!fecha) return '—'
-  // "2026-05-15 00:00:00" -> dd/mm
-  const f = new Date(fecha.replace(' ', 'T'))
-  if (isNaN(f)) return fecha.slice(0, 10)
+  const f = new Date(String(fecha).replace(' ', 'T'))
+  if (isNaN(f)) return String(fecha).slice(0, 10)
   return f.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })
 }
 
-// Devuelve { lista: [{id, nombre}], datos: { [id]: museoFormateado } } o null.
+// Devuelve { lista: [{id, nombre}], datos: { [id]: ubicacionFormateada } } o null.
 export async function cargarDashboard() {
-  const [ms, ss, meds] = await Promise.all([
-    museos.listar(),
+  const [us, ss, meds] = await Promise.all([
+    ubicaciones.listar(),
     sensores.listar(),
     mediciones.listar(),
   ])
-  const museosL = aLista(ms)
-  const sensL = aLista(ss)
+  const ubic = aLista(us)
+  const sens = aLista(ss)
   const medsL = aLista(meds)
-  if (!museosL.length) return null
+  if (!ubic.length) return null
 
-  // Última medición por sensor
+  // sensor por referencia (datos SQL: id, estado, notas)
+  const sensorPorRef = {}
+  for (const s of sens) if (s.referencia) sensorPorRef[s.referencia] = s
+
+  // última medición por sensor_id
   const ultima = {}
   for (const m of medsL) {
     const sid = m.sensor_id
@@ -57,45 +51,48 @@ export async function cargarDashboard() {
   const datos = {}
   const lista = []
 
-  for (const mu of museosL) {
-    const tokens = tokensMuseo(mu.nombre)
-    const propios = sensL.filter((s) => {
-      const ref = (s.referencia || '').toUpperCase()
-      return tokens.some((t) => ref.includes(t))
-    })
+  for (const u of ubic) {
+    const uid = idDe(u)
+    const nombre = u.notas || u.descripcion || 'Ubicación'
+    const refs = (u.sensores ?? []).map((s) => s.referencia).filter(Boolean)
 
-    const sens = propios.map((s) => {
-      const med = ultima[s.id]
+    const sensoresUbic = refs.map((ref) => {
+      const s = sensorPorRef[ref]
+      const med = s ? ultima[s.id] : null
       const ph = aNum(med?.valor_ph)
       return {
-        id: s.id,
-        nombre: s.referencia,
-        sala: s.notas || mu.ciudad || '—',
+        id: s?.id ?? ref,
+        nombre: ref,
+        sala: s?.notas || nombre,
         ph: ph ?? 0,
         estado: estadoPorPh(ph),
         ultimaLectura: horaDe(med?.fecha),
       }
     })
 
-    const medsMuseo = propios.map((s) => ultima[s.id]).filter(Boolean)
-    const prom = (arr) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null)
-    const phs = sens.map((s) => s.ph).filter((n) => n > 0)
-    const temp = prom(medsMuseo.map((m) => aNum(m.temperatura)).filter((n) => n != null))
-    const hum = prom(medsMuseo.map((m) => aNum(m.humedad_relativa)).filter((n) => n != null))
+    const medsUbic = refs
+      .map((ref) => sensorPorRef[ref])
+      .filter(Boolean)
+      .map((s) => ultima[s.id])
+      .filter(Boolean)
 
-    datos[mu.id] = {
-      nombre: mu.nombre,
-      ciudad: mu.ciudad,
-      pais: mu.pais,
-      categoria: mu.categoria,
+    const prom = (arr) => (arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null)
+    const phs = sensoresUbic.map((se) => se.ph).filter((n) => n > 0)
+    const temp = prom(medsUbic.map((m) => aNum(m.temperatura)).filter((n) => n != null))
+    const hum = prom(medsUbic.map((m) => aNum(m.humedad_relativa)).filter((n) => n != null))
+
+    datos[uid] = {
+      nombre,
       humedad: hum != null ? `${hum.toFixed(1).replace('.', ',')} %` : '—',
       temperatura: temp != null ? `${temp.toFixed(1).replace('.', ',')}° C` : '—',
       phPromedio: phs.length ? phs.reduce((a, b) => a + b, 0) / phs.length : 0,
-      ultimaActualizacion: medsMuseo.length ? horaDe(medsMuseo.map((m) => m.fecha).sort().pop()) : '—',
-      sensores: sens,
+      ultimaActualizacion: medsUbic.length
+        ? horaDe(medsUbic.map((m) => m.fecha).sort().pop())
+        : '—',
+      sensores: sensoresUbic,
       notas: [],
     }
-    lista.push({ id: mu.id, nombre: mu.nombre })
+    lista.push({ id: uid, nombre })
   }
 
   return { lista, datos }

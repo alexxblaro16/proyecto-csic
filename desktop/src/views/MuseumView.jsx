@@ -172,12 +172,12 @@ function DashboardCargando() {
   return (
     <>
       <header className="h-14 border-b border-white/5 flex items-center px-6 bg-slate-950 flex-shrink-0">
-        <span className="text-sm font-semibold text-white">Museos</span>
+        <span className="text-sm font-semibold text-white">Monitorización</span>
       </header>
       <div className="flex-1 flex items-center justify-center bg-[#0f1117]">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 rounded-full border-2 border-cyan-400/30 border-t-cyan-400 animate-spin" />
-          <p className="text-slate-400 text-sm">Cargando museos…</p>
+          <p className="text-slate-400 text-sm">Cargando ubicaciones…</p>
         </div>
       </div>
     </>
@@ -214,7 +214,7 @@ function SelectorMuseos({ lista, datos, activoId, onSelect, fuente }) {
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <span className="text-xs text-slate-500 uppercase tracking-widest">Museo</span>
+      <span className="text-xs text-slate-500 uppercase tracking-widest">Ubicación</span>
 
       <div className="relative" ref={ref}>
         <button
@@ -222,7 +222,7 @@ function SelectorMuseos({ lista, datos, activoId, onSelect, fuente }) {
           onClick={() => setAbierto((o) => !o)}
           className="flex items-center justify-between gap-3 min-w-[220px] rounded-xl border border-white/10 bg-slate-900 pl-4 pr-3 py-2 text-sm text-white hover:bg-white/5 focus:border-cyan-400/50 outline-none transition"
         >
-          <span className="truncate">{museo?.nombre ?? 'Selecciona un museo'}</span>
+          <span className="truncate">{museo?.nombre ?? 'Selecciona una ubicación'}</span>
           <span className={`text-slate-400 text-xs transition-transform ${abierto ? 'rotate-180' : ''}`}>▾</span>
         </button>
 
@@ -291,7 +291,7 @@ function Header({ museo }) {
   return (
     <header className="h-14 border-b border-white/5 flex items-center justify-between px-6 bg-slate-950 flex-shrink-0">
       <div className="flex items-center gap-2 text-sm">
-        <span className="text-slate-400 hover:text-white cursor-pointer transition">Museos</span>
+        <span className="text-slate-400 hover:text-white cursor-pointer transition">Ubicación</span>
         <span className="text-slate-600">/</span>
         <span className="font-semibold text-white">{museo.nombre}</span>
         {alertas > 0 && (
