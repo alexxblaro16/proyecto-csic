@@ -1,4 +1,4 @@
-// Vista de Monitorización (dashboard por ubicación). Datos SOLO reales del back.
+// Vista de Museos (dashboard por museo). Datos SOLO reales del back.
 // Componentes de render basados en la rama andrea.
 
 import { useState, useEffect, useRef } from 'react'
@@ -54,7 +54,7 @@ export default function MuseumView() {
   }, [])
 
   if (cargando) return <DashboardCargando />
-  // Solo datos reales: si el back no responde o no hay ubicaciones, estado vacío (sin demo).
+  // Solo datos reales: si el back no responde o no hay museos, estado vacío (sin demo).
   if (error || !datos || !lista.length) return <DashboardVacio error={error} />
 
   const museo = datos[museoActivoId] ?? Object.values(datos)[0]
@@ -78,17 +78,17 @@ function DashboardVacio({ error }) {
   return (
     <>
       <header className="h-14 border-b border-white/5 flex items-center px-6 bg-slate-950 flex-shrink-0">
-        <span className="text-sm font-semibold text-white">Monitorización</span>
+        <span className="text-sm font-semibold text-white">Museos</span>
       </header>
       <div className="flex-1 flex items-center justify-center bg-[#0f1117]">
         <div className="text-center max-w-sm">
           <p className="text-slate-300 font-medium">
-            {error ? 'No se pudo conectar con el back' : 'No hay ubicaciones con datos'}
+            {error ? 'No se pudo conectar con el back' : 'No hay museos con datos'}
           </p>
           <p className="text-sm text-slate-500 mt-2">
             {error
               ? 'Comprueba que la API esté levantada en localhost:8180 (docker compose up).'
-              : 'Cuando el back tenga ubicaciones y sensores, aparecerán aquí.'}
+              : 'Cuando el back tenga museos y sensores, aparecerán aquí.'}
           </p>
         </div>
       </div>
@@ -102,12 +102,12 @@ function DashboardCargando() {
   return (
     <>
       <header className="h-14 border-b border-white/5 flex items-center px-6 bg-slate-950 flex-shrink-0">
-        <span className="text-sm font-semibold text-white">Monitorización</span>
+        <span className="text-sm font-semibold text-white">Museos</span>
       </header>
       <div className="flex-1 flex items-center justify-center bg-[#0f1117]">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 rounded-full border-2 border-cyan-400/30 border-t-cyan-400 animate-spin" />
-          <p className="text-slate-400 text-sm">Cargando ubicaciones…</p>
+          <p className="text-slate-400 text-sm">Cargando museos…</p>
         </div>
       </div>
     </>
@@ -144,7 +144,7 @@ function SelectorMuseos({ lista, datos, activoId, onSelect }) {
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <span className="text-xs text-slate-500 uppercase tracking-widest">Ubicación</span>
+      <span className="text-xs text-slate-500 uppercase tracking-widest">Museo</span>
 
       <div className="relative" ref={ref}>
         <button
@@ -152,7 +152,7 @@ function SelectorMuseos({ lista, datos, activoId, onSelect }) {
           onClick={() => setAbierto((o) => !o)}
           className="flex items-center justify-between gap-3 min-w-[220px] rounded-xl border border-white/10 bg-slate-900 pl-4 pr-3 py-2 text-sm text-white hover:bg-white/5 focus:border-cyan-400/50 outline-none transition"
         >
-          <span className="truncate">{museo?.nombre ?? 'Selecciona una ubicación'}</span>
+          <span className="truncate">{museo?.nombre ?? 'Selecciona un museo'}</span>
           <span className={`text-slate-400 text-xs transition-transform ${abierto ? 'rotate-180' : ''}`}>▾</span>
         </button>
 
@@ -215,7 +215,7 @@ function Header({ museo }) {
   return (
     <header className="h-14 border-b border-white/5 flex items-center justify-between px-6 bg-slate-950 flex-shrink-0">
       <div className="flex items-center gap-2 text-sm">
-        <span className="text-slate-400 hover:text-white cursor-pointer transition">Ubicación</span>
+        <span className="text-slate-400 hover:text-white cursor-pointer transition">Museos</span>
         <span className="text-slate-600">/</span>
         <span className="font-semibold text-white">{museo.nombre}</span>
         {alertas > 0 && (
