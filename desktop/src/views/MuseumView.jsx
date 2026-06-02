@@ -109,27 +109,47 @@ function claseEstado(estado) {
 // Vista de Museos (dashboard). Se renderiza dentro del AppLayout (que ya aporta
 // la sidebar global), por eso aquí solo va Header + selector de museo + contenido.
 export default function MuseumView() {
-  // Por defecto datos demo; si el back responde, se sustituyen por los reales.
-  const [datos, setDatos] = useState(MUSEOS_DATOS)
-  const [lista, setLista] = useState(museosMock)
-  const [museoActivoId, setMuseoActivoId] = useState(1)
+  const [datos, setDatos] = useState(null)
+  const [lista, setLista] = useState([])
+  const [museoActivoId, setMuseoActivoId] = useState(null)
   const [fuente, setFuente] = useState('demo') // demo | api
+  const [cargando, setCargando] = useState(true)
 
   useEffect(() => {
     let activo = true
+    const usarDemo = () => {
+      setDatos(MUSEOS_DATOS)
+      setLista(museosMock)
+      setMuseoActivoId(museosMock[0].id)
+      setFuente('demo')
+    }
     cargarDashboard()
       .then((res) => {
-        if (!activo || !res || !res.lista.length) return
-        setDatos(res.datos)
-        setLista(res.lista)
-        setMuseoActivoId(res.lista[0].id)
-        setFuente('api')
+        if (!activo) return
+        if (res && res.lista.length) {
+          setDatos(res.datos)
+          setLista(res.lista)
+          setMuseoActivoId(res.lista[0].id)
+          setFuente('api')
+        } else {
+          usarDemo()
+        }
       })
-      .catch(() => {}) // si el back falla, se queda el demo
+      .catch(() => {
+        if (activo) usarDemo()
+      })
+      .finally(() => {
+        if (activo) setCargando(false)
+      })
     return () => {
       activo = false
     }
   }, [])
+
+  // Mientras cargan los datos no mostramos un museo "de relleno": estado de carga.
+  if (cargando || !datos) {
+    return <DashboardCargando />
+  }
 
   const museo = datos[museoActivoId] ?? Object.values(datos)[0]
 
@@ -146,39 +166,72 @@ export default function MuseumView() {
   )
 }
 
-// ── Selector de museo (pills) ───────────────────────────────────────────────
-// Sustituye al inventario que antes vivía en la sidebar interna. Cambia el
-// museo activo del dashboard sin salir de la vista.
+// ── Estado de carga ───────────────────────────────────────────────────────────
+
+function DashboardCargando() {
+  return (
+    <>
+      <header className="h-14 border-b border-white/5 flex items-center px-6 bg-slate-950 flex-shrink-0">
+        <span className="text-sm font-semibold text-white">Museos</span>
+      </header>
+      <div className="flex-1 flex items-center justify-center bg-[#0f1117]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-2 border-cyan-400/30 border-t-cyan-400 animate-spin" />
+          <p className="text-slate-400 text-sm">Cargando museos…</p>
+        </div>
+      </div>
+    </>
+  )
+}
+
+// ── Selector de museo (dropdown) ────────────────────────────────────────────
+// Más limpio que las pills cuando hay muchos museos: un desplegable + la info
+// del museo activo (ciudad/país) y el contador de alertas.
 
 function SelectorMuseos({ lista, datos, activoId, onSelect, fuente }) {
+  const museo = datos[activoId]
+  const alertCount = museo?.sensores?.filter(s => s.estado !== 'ÓPTIMO' && s.estado !== 'SIN DATOS').length ?? 0
+
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <span className="text-xs text-slate-500 uppercase tracking-widest mr-1">Museo</span>
-      {lista.map(m => {
-        const d          = datos[m.id]
-        const alertCount = d?.sensores?.filter(s => s.estado !== 'ÓPTIMO' && s.estado !== 'SIN DATOS').length ?? 0
-        const activo     = activoId === m.id
-        return (
-          <button
-            key={m.id}
-            onClick={() => onSelect(m.id)}
-            className={`inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm transition ${
-              activo
-                ? 'border-cyan-400/40 bg-cyan-400/10 text-cyan-200 font-medium'
-                : 'border-white/10 bg-slate-900 text-slate-300 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            {m.nombre}
-            {alertCount > 0 && (
-              <span className="text-xs bg-orange-400/15 text-orange-300 rounded-full px-1.5 py-0.5 font-medium">
-                {alertCount}
-              </span>
-            )}
-          </button>
-        )
-      })}
+    <div className="flex flex-wrap items-center gap-3">
+      <label htmlFor="selector-museo" className="text-xs text-slate-500 uppercase tracking-widest">
+        Museo
+      </label>
+
+      <div className="relative">
+        <select
+          id="selector-museo"
+          value={activoId ?? ''}
+          onChange={(e) => {
+            const v = e.target.value
+            onSelect(/^\d+$/.test(v) ? Number(v) : v)
+          }}
+          className="appearance-none rounded-xl border border-white/10 bg-slate-900 pl-4 pr-10 py-2 text-sm text-white outline-none focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/50 hover:bg-white/5 transition cursor-pointer"
+        >
+          {lista.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.nombre}
+            </option>
+          ))}
+        </select>
+        <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">▾</span>
+      </div>
+
+      {museo?.ciudad && (
+        <span className="text-sm text-slate-400">
+          {museo.ciudad}
+          {museo.pais ? `, ${museo.pais}` : ''}
+        </span>
+      )}
+
+      {alertCount > 0 && (
+        <span className="text-xs bg-orange-400/15 text-orange-300 rounded-full px-2 py-0.5 font-medium">
+          {alertCount} alerta{alertCount > 1 ? 's' : ''}
+        </span>
+      )}
+
       <span
-        className={`ml-2 text-xs rounded-full px-2 py-0.5 border ${
+        className={`ml-auto text-xs rounded-full px-2 py-0.5 border ${
           fuente === 'api'
             ? 'border-green-400/30 bg-green-400/10 text-green-300'
             : 'border-white/10 bg-white/5 text-slate-400'
