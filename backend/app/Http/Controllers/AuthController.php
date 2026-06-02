@@ -1,5 +1,9 @@
 <?php
 
+// Ivan: esto lo he tocado yo (Alejandro) para que el front vaya bien.
+// Lo he anadido para el login (POST /api/login con Sanctum). Si lo quieres
+// asumir/ajustar tu como back, adelante — lo deje funcionando para no bloquear.
+
 namespace App\Http\Controllers;
 
 use App\Models\User;

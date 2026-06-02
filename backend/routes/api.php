@@ -42,6 +42,8 @@ Route::get('/test-mongodb', function () {
 }); */
 
 // Autenticación
+// Ivan: rutas de login/logout anadidas por Alejandro (front) para que el login
+// del desktop funcione. Si las asumes tu como back, son todas tuyas.
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
 
 // Rutas públicas (sin autenticación)
