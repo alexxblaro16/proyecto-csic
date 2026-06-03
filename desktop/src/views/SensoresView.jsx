@@ -89,6 +89,12 @@ export default function SensoresView() {
   const activos = sensoresDelMuseo.filter((s) => (s.estado || '').toLowerCase().includes('activ')).length
   const numUbicaciones = new Set(sensoresDelMuseo.map((s) => nombreUbicacion(s))).size
 
+  // Sensores con pH fuera de rango en el museo activo (mismo criterio que Alertas
+  // y el selector): estado distinto de ÓPTIMO/SIN DATOS.
+  const fueraDeRango = (museoActivo?.sensores ?? []).filter(
+    (s) => s.estado !== 'ÓPTIMO' && s.estado !== 'SIN DATOS'
+  ).length
+
   // Salas únicas para el dropdown, derivadas de los sensores del museo activo.
   const salas = [
     ...new Map(
@@ -111,9 +117,14 @@ export default function SensoresView() {
     <ViewLayout titulo="Sensores" subtitulo="Datos en vivo · GET /api/sensores">
       {/* Tira de métricas (del museo seleccionado) */}
       {estado === 'ok' && sensoresDelMuseo.length > 0 && (
-        <div className="grid grid-cols-3 gap-4 mb-5">
+        <div className="grid grid-cols-4 gap-4 mb-5">
           <Metrica etiqueta="Sensores" valor={sensoresDelMuseo.length} />
           <Metrica etiqueta="Activos" valor={activos} color="text-green-400" />
+          <Metrica
+            etiqueta="Fuera de rango"
+            valor={fueraDeRango}
+            color={fueraDeRango > 0 ? 'text-orange-400' : 'text-green-400'}
+          />
           <Metrica etiqueta="Ubicaciones" valor={numUbicaciones} />
         </div>
       )}

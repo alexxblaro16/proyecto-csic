@@ -50,7 +50,7 @@ function DashboardVacio({ error }) {
   return (
     <>
       <header className="h-14 border-b border-white/5 flex items-center px-6 bg-slate-950 flex-shrink-0">
-        <span className="text-sm font-semibold text-white">Museos</span>
+        <span className="text-sm font-semibold text-white">Resumen</span>
       </header>
       <div className="flex-1 flex items-center justify-center bg-[#0f1117]">
         <div className="text-center max-w-sm">
@@ -74,7 +74,7 @@ function DashboardCargando() {
   return (
     <>
       <header className="h-14 border-b border-white/5 flex items-center px-6 bg-slate-950 flex-shrink-0">
-        <span className="text-sm font-semibold text-white">Museos</span>
+        <span className="text-sm font-semibold text-white">Resumen</span>
       </header>
       <div className="flex-1 flex items-center justify-center bg-[#0f1117]">
         <div className="flex flex-col items-center gap-3">
@@ -97,7 +97,7 @@ function Header({ museo }) {
   return (
     <header className="h-14 border-b border-white/5 flex items-center justify-between px-6 bg-slate-950 flex-shrink-0">
       <div className="flex items-center gap-2 text-sm">
-        <span className="text-slate-400 hover:text-white cursor-pointer transition">Museos</span>
+        <span className="text-slate-400 hover:text-white cursor-pointer transition">Resumen</span>
         <span className="text-slate-600">/</span>
         <span className="font-semibold text-white">{museo.nombre}</span>
         {alertas > 0 && (

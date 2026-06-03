@@ -4,8 +4,11 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { logout, usuarioActual } from '../auth.js'
 
+// La antigua pestaña "Museos" pasa a ser "Resumen": el museo ya se elige en el
+// selector global (barra superior), así que esta vista solo muestra el resumen
+// del museo activo. La ruta sigue siendo /museos para no romper enlaces.
 const NAV = [
-  { to: '/museos', label: 'Museos' },
+  { to: '/museos', label: 'Resumen' },
   { to: '/sensores', label: 'Sensores' },
   { to: '/analitica', label: 'Analítica' },
   { to: '/alertas', label: 'Alertas' },
