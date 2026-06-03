@@ -44,6 +44,7 @@ export default function SensoresView() {
   const [error, setError] = useState('')
   const [sensorActivo, setSensorActivo] = useState(null) // sensor del modal 360
   const [sensorDetalle, setSensorDetalle] = useState(null) // sensor del modal detalle
+  const [salaSel, setSalaSel] = useState('todas') // filtro de sala activo en el dropdown
 
   const cargar = async () => {
     setEstado('cargando')
@@ -83,6 +84,30 @@ export default function SensoresView() {
   const activos = sensores.filter((s) => (s.estado || '').toLowerCase().includes('activ')).length
   const numUbicaciones = new Set(sensores.map((s) => nombreUbicacion(s))).size
 
+  // Salas únicas para el dropdown. Se derivan de los propios sensores: si el back
+  // ya devuelve ubicacion_sql.museo embebido, mostramos también el museo; si no,
+  // caemos al nombre resuelto por el mapa de referencias (compatibilidad).
+  const salas = [
+    ...new Map(
+      sensores
+        .filter((s) => s.ubicacion_id != null)
+        .map((s) => [
+          String(s.ubicacion_id),
+          {
+            id: s.ubicacion_id,
+            nombre: nombreUbicacion(s),
+            museo: s.ubicacion_sql?.museo?.nombre ?? null,
+          },
+        ])
+    ).values(),
+  ]
+
+  // Sensores tras aplicar el filtro de sala del dropdown
+  const sensoresFiltrados =
+    salaSel === 'todas'
+      ? sensores
+      : sensores.filter((s) => String(s.ubicacion_id) === String(salaSel))
+
   return (
     <ViewLayout titulo="Sensores" subtitulo="Datos en vivo · GET /api/sensores">
       {/* Tira de métricas */}
@@ -102,12 +127,29 @@ export default function SensoresView() {
               {estado === 'ok' ? `${sensores.length} sensores recibidos del back` : 'Conectando con el back…'}
             </p>
           </div>
-          <button
-            onClick={cargar}
-            className="rounded-full bg-cyan-400 px-3 py-1.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
-          >
-            Recargar
-          </button>
+          <div className="flex items-center gap-3">
+            {/* Dropdown de filtro por sala */}
+            <select
+              value={salaSel}
+              onChange={(e) => setSalaSel(e.target.value)}
+              className="rounded-full bg-slate-800 border border-white/10 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-700 transition cursor-pointer"
+            >
+              <option value="todas">Todas las salas</option>
+              {salas.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.nombre}
+                  {u.museo ? ` · ${u.museo}` : ''}
+                </option>
+              ))}
+            </select>
+
+            <button
+              onClick={cargar}
+              className="rounded-full bg-cyan-400 px-3 py-1.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+            >
+              Recargar
+            </button>
+          </div>
         </div>
 
         {estado === 'cargando' && (
@@ -141,7 +183,7 @@ export default function SensoresView() {
               </tr>
             </thead>
             <tbody>
-              {sensores.map((s, i) => (
+              {sensoresFiltrados.map((s, i) => (
                 <tr
                   key={s.id ?? s._id ?? i}
                   onClick={() => setSensorDetalle(s)}
