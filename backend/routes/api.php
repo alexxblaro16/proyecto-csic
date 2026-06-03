@@ -55,8 +55,10 @@ Route::apiResource('sensores', App\Http\Controllers\SensorController::class);
 Route::apiResource('mediciones', App\Http\Controllers\MedicionController::class);
 Route::apiResource('campanias', App\Http\Controllers\CampaniaController::class);
 //Route::apiResource('imagenes', App\Http\Controllers\ImagenController::class);
+Route::post('/imagenes', [App\Http\Controllers\ImagenController::class, 'store']);
 
 // Rutas específicas para imágenes por sensor o ubicación
+Route::post('/imagenes/ubicacion/{ubicacion_id}', [App\Http\Controllers\ImagenController::class, 'storeByUbicacion']);
 Route::get('/imagenes/sensor/{sensor_referencia}', [App\Http\Controllers\ImagenController::class, 'showBySensor']);
 Route::get('/imagenes/ubicacion/{ubicacion_id}', [App\Http\Controllers\ImagenController::class, 'showByUbicacion']);
 

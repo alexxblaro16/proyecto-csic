@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Imagen;
+use App\Models\UbicacionImagen;
 use Illuminate\Http\Request;
 
 class ImagenController extends Controller
@@ -22,12 +23,19 @@ class ImagenController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'sensor_referencia' => 'nullable|string',
-            'ubicacion_id' => 'nullable|string',
+            'sensor_referencia' => 'nullable|string|required_without:ubicacion_id',
+            'ubicacion_id' => 'nullable|string|required_without:sensor_referencia',
             'archivo' => 'required|file',
             'notas' => 'nullable|string',
             'tipo' => 'nullable|string|in:sensor,ubicacion',
         ]);
+
+        if (!empty($validated['ubicacion_id']) && !UbicacionImagen::find($validated['ubicacion_id'])) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'La ubicación de imágenes no existe en MongoDB',
+            ], 422);
+        }
 
         if ($request->file('archivo')) {
             $path = $request->file('archivo')->store('imagenes', 'public');
@@ -35,9 +43,39 @@ class ImagenController extends Controller
         }
 
         $validated['fecha_subida'] = now();
-        $validated['tipo'] = $validated['tipo'] ?? 'sensor';
+        $validated['tipo'] = $validated['tipo'] ?? (!empty($validated['ubicacion_id']) ? 'ubicacion' : 'sensor');
 
         $imagen = Imagen::create($validated);
+        return response()->json($imagen, 201);
+    }
+
+    /**
+     * Crear una imagen asociada a una ubicación documental de MongoDB
+     */
+    public function storeByUbicacion(Request $request, $ubicacion_id)
+    {
+        $validated = $request->validate([
+            'archivo' => 'required|file',
+            'notas' => 'nullable|string',
+        ]);
+
+        if (!UbicacionImagen::find($ubicacion_id)) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Ubicación de imágenes no encontrada',
+            ], 404);
+        }
+
+        $path = $request->file('archivo')->store('imagenes', 'public');
+
+        $imagen = Imagen::create([
+            'ubicacion_id' => $ubicacion_id,
+            'archivo' => asset('storage/' . $path),
+            'notas' => $validated['notas'] ?? null,
+            'fecha_subida' => now(),
+            'tipo' => 'ubicacion',
+        ]);
+
         return response()->json($imagen, 201);
     }
 
