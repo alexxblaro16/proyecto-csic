@@ -12,7 +12,8 @@ class SensorController extends Controller
      */
     public function index()
     {
-        $sensores = Sensor::all();
+        $sensores = Sensor::with('ubicacionSql.museo')->get();
+
         return response()->json($sensores);
     }
 
@@ -22,7 +23,7 @@ class SensorController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'ubicacion_id' => 'required|integer|exists:ubicacion,id',
+            'ubicacion_id' => 'required|integer|exists:ubicaciones,id',
             'referencia' => 'required|string|max:255',
             'estado' => 'nullable|string|max:255',
             'eje_x' => 'nullable|numeric',
@@ -31,7 +32,8 @@ class SensorController extends Controller
             'notas' => 'nullable|string',
         ]);
 
-        $sensor = Sensor::create($validated);
+        $sensor = Sensor::create($validated)->load('ubicacionSql.museo');
+
         return response()->json($sensor, 201);
     }
 
@@ -40,7 +42,7 @@ class SensorController extends Controller
      */
     public function show($id)
     {
-        $sensor = Sensor::find($id);
+        $sensor = Sensor::with('ubicacionSql.museo')->find($id);
 
         if (!$sensor) {
             return response()->json([
@@ -67,7 +69,7 @@ class SensorController extends Controller
         }
 
         $validated = $request->validate([
-            'ubicacion_id' => 'sometimes|required|integer|exists:ubicacion,id',
+            'ubicacion_id' => 'sometimes|required|integer|exists:ubicaciones,id',
             'referencia' => 'sometimes|required|string|max:255',
             'estado' => 'nullable|string|max:255',
             'eje_x' => 'nullable|numeric',
@@ -77,6 +79,8 @@ class SensorController extends Controller
         ]);
 
         $sensor->update($validated);
+        $sensor->load('ubicacionSql.museo');
+
         return response()->json($sensor);
     }
 

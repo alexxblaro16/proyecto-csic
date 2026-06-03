@@ -18,7 +18,7 @@ class Sensor extends Model
         'notas'
     ];
 
-    public function ubicacion()
+    public function ubicacionSql()
     {
         return $this->belongsTo(UbicacionSql::class, 'ubicacion_id');
     }
@@ -26,5 +26,10 @@ class Sensor extends Model
     public function medidas()
     {
         return $this->hasMany(Medicion::class, 'sensor_id');
+    }
+
+    public function imagenesMongo()
+    {
+        return Imagen::bySensor($this->referencia);
     }
 }

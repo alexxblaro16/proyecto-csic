@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Ubicacion;
+use App\Models\UbicacionSql;
 
 class UbicacionController extends Controller
 {
@@ -12,7 +12,7 @@ class UbicacionController extends Controller
      */
     public function index()
     {
-        $ubicaciones = Ubicacion::all();
+        $ubicaciones = UbicacionSql::with('museo')->get();
         return response()->json($ubicaciones);
     }
 
@@ -22,15 +22,14 @@ class UbicacionController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'museo_id' => 'required|integer',
+            'museo_id' => 'required|integer|exists:museos,id',
             'posicion' => 'required|string|max:255',
-            'nombre' => 'nullable|string',
+            'nombre' => 'nullable|string|max:255',
             'es_exterior' => 'nullable|boolean',
             'notas' => 'nullable|string',
         ]);
 
-        $validated['sensores'] = [];
-        $ubicacion = Ubicacion::create($validated);
+        $ubicacion = UbicacionSql::create($validated)->load('museo');
         return response()->json($ubicacion, 201);
     }
 
@@ -39,7 +38,7 @@ class UbicacionController extends Controller
      */
     public function show($id)
     {
-        $ubicacion = Ubicacion::find($id);
+        $ubicacion = UbicacionSql::with(['museo', 'sensores'])->find($id);
 
         if (!$ubicacion) {
             return response()->json([
@@ -56,7 +55,7 @@ class UbicacionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $ubicacion = Ubicacion::find($id);
+        $ubicacion = UbicacionSql::find($id);
 
         if (!$ubicacion) {
             return response()->json([
@@ -66,7 +65,7 @@ class UbicacionController extends Controller
         }
 
         $validated = $request->validate([
-            'museo_id' => 'sometimes|required|integer',
+            'museo_id' => 'sometimes|required|integer|exists:museos,id',
             'posicion' => 'sometimes|required|string|max:255',
             'nombre' => 'nullable|string|max:255',
             'es_exterior' => 'nullable|boolean',
@@ -74,6 +73,8 @@ class UbicacionController extends Controller
         ]);
 
         $ubicacion->update($validated);
+        $ubicacion->load('museo');
+
         return response()->json($ubicacion);
     }
 
@@ -82,7 +83,7 @@ class UbicacionController extends Controller
      */
     public function destroy($id)
     {
-        $ubicacion = Ubicacion::find($id);
+        $ubicacion = UbicacionSql::find($id);
 
         if (!$ubicacion) {
             return response()->json([

@@ -4,17 +4,17 @@ namespace App\Models;
 
 use MongoDB\Laravel\Eloquent\Model;
 
-class Ubicacion extends Model
+class UbicacionImagen extends Model
 {
     protected $connection = 'mongodb';
     protected $collection = 'ubicaciones';
 
     protected $fillable = [
         'notas',
-        'sensores'
+        'sensores',
     ];
 
     protected $casts = [
-        'sensores' => 'array'
+        'sensores' => 'array',
     ];
 }

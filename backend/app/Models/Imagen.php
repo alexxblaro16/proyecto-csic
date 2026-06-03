@@ -27,7 +27,7 @@ class Imagen extends Model
      */
     public function ubicacion()
     {
-        return $this->belongsTo(Ubicacion::class, 'ubicacion_id');
+        return $this->belongsTo(UbicacionImagen::class, 'ubicacion_id');
     }
 
     /**

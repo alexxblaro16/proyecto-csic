@@ -50,6 +50,7 @@ Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
 Route::apiResource('usuarios', App\Http\Controllers\UserController::class);
 Route::apiResource('museos', App\Http\Controllers\MuseoController::class);
 Route::apiResource('ubicaciones', App\Http\Controllers\UbicacionController::class);
+Route::apiResource('ubicaciones-imagenes', App\Http\Controllers\UbicacionImagenController::class);
 Route::apiResource('sensores', App\Http\Controllers\SensorController::class);
 Route::apiResource('mediciones', App\Http\Controllers\MedicionController::class);
 Route::apiResource('campanias', App\Http\Controllers\CampaniaController::class);

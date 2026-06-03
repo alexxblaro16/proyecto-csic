@@ -30,5 +30,10 @@ class UbicacionSql extends Model
     {
         return $this->hasMany(Medicion::class, 'ubicacion_id');
     }
+
+    public function museo()
+    {
+        return $this->belongsTo(Museo::class, 'museo_id');
+    }
     
 }

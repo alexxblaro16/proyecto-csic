@@ -18,7 +18,7 @@ class Museo extends Model
 
     public function ubicaciones()
     {
-        return $this->hasMany(Ubicacion::class, 'museo_id');
+        return $this->hasMany(UbicacionSql::class, 'museo_id');
     }
     
 

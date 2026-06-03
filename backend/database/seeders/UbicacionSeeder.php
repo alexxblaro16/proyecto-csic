@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Ubicacion;
+use App\Models\UbicacionImagen;
 use App\Models\Museo;
 use App\Models\Sensor;
 use App\Models\Imagen;
@@ -51,7 +51,7 @@ class UbicacionSeeder extends Seeder
             }
 
             // Crear ubicación en MongoDB solo con _id, notas y sensores con imágenes
-            Ubicacion::create([
+            UbicacionImagen::create([
                 'notas' => $ubicacion_sql->notas ?? '',
                 'sensores' => $sensores_data
             ]);
