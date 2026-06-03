@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react'
 import ViewLayout from '../components/ViewLayout.jsx'
 import { mediciones as apiMediciones, sensores as apiSensores } from '../api/index.js'
 import { estadoPorPh } from '../api/dashboard.js'
+import { useMuseo } from '../context/MuseoContext.jsx'
 
 const aLista = (r) => (Array.isArray(r) ? r : r?.data ?? [])
 
 export default function AlertasView() {
+  const { museoActivo, sensorIdsActivos } = useMuseo() // museo del selector global
   const [alertas, setAlertas] = useState([])
   const [estado, setEstado] = useState('cargando') // cargando | ok | error
   const [error, setError] = useState('')
@@ -30,6 +32,7 @@ export default function AlertasView() {
         .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
         .map((m) => ({
           id: m.id,
+          sensorId: m.sensor_id,
           sensor: refPorId[m.sensor_id] ?? `Sensor ${m.sensor_id}`,
           ph: m.ph,
           estado: estadoPorPh(m.ph),
@@ -56,15 +59,21 @@ export default function AlertasView() {
         ? 'bg-blue-400/10 text-blue-300 border-blue-400/20'
         : 'bg-slate-400/10 text-slate-300 border-slate-400/20'
 
+  // Solo las alertas de sensores del museo activo. Reactivo al cambiar de museo.
+  const alertasMuseo = alertas.filter((a) => sensorIdsActivos.has(String(a.sensorId)))
+
   return (
-    <ViewLayout titulo="Alertas" subtitulo="pH fuera de rango (6,5 – 7,5)">
+    <ViewLayout
+      titulo="Alertas"
+      subtitulo={`pH fuera de rango (6,5 – 7,5)${museoActivo ? ` · ${museoActivo.nombre}` : ''}`}
+    >
       <div className="rounded-2xl border border-white/10 bg-slate-900 overflow-hidden">
         <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
           <div>
             <h2 className="font-semibold text-white">Alertas activas</h2>
             <p className="text-sm text-slate-400">
               {estado === 'ok'
-                ? `${alertas.length} medición${alertas.length !== 1 ? 'es' : ''} fuera de rango`
+                ? `${alertasMuseo.length} medición${alertasMuseo.length !== 1 ? 'es' : ''} fuera de rango`
                 : 'Analizando mediciones del back…'}
             </p>
           </div>
@@ -89,14 +98,14 @@ export default function AlertasView() {
           </div>
         )}
 
-        {estado === 'ok' && alertas.length === 0 && (
+        {estado === 'ok' && alertasMuseo.length === 0 && (
           <div className="px-6 py-10 text-center">
             <p className="text-green-300 font-medium">✓ Sin alertas</p>
             <p className="text-sm text-slate-500 mt-1">Todas las mediciones están dentro del rango 6,5 – 7,5.</p>
           </div>
         )}
 
-        {estado === 'ok' && alertas.length > 0 && (
+        {estado === 'ok' && alertasMuseo.length > 0 && (
           <table className="w-full">
             <thead>
               <tr className="border-b border-white/5">
@@ -108,7 +117,7 @@ export default function AlertasView() {
               </tr>
             </thead>
             <tbody>
-              {alertas.map((a) => (
+              {alertasMuseo.map((a) => (
                 <tr key={a.id} className="border-b border-white/5 last:border-0 hover:bg-white/5 transition">
                   <td className="px-5 py-4">
                     <span className={`inline-flex items-center text-sm font-medium px-2.5 py-0.5 rounded-full border ${colorEstado(a.estado)}`}>

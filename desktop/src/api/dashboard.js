@@ -105,5 +105,5 @@ export async function cargarSeriePh() {
   return meds
     .filter((m) => m.valor_ph != null)
     .sort((a, b) => new Date(a.fecha) - new Date(b.fecha))
-    .map((m) => ({ hora: horaDe(m.fecha), ph: aNum(m.valor_ph) }))
+    .map((m) => ({ hora: horaDe(m.fecha), ph: aNum(m.valor_ph), sensorId: m.sensor_id }))
 }

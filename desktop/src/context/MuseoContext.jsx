@@ -47,6 +47,12 @@ export function MuseoProvider({ children }) {
 
   const museoActivo = museoActivoId != null ? datos[museoActivoId] ?? null : null
 
+  // Sensores del museo activo (ya asociados por cargarDashboard) y el conjunto de
+  // sus IDs. Las vistas de Sensores/Analítica/Alertas filtran por aquí, así lo que
+  // muestran coincide siempre con lo que cuenta el selector para ese museo.
+  const sensoresActivos = museoActivo?.sensores ?? []
+  const sensorIdsActivos = new Set(sensoresActivos.map((s) => String(s.id)))
+
   return (
     <MuseoContext.Provider
       value={{
@@ -55,6 +61,8 @@ export function MuseoProvider({ children }) {
         museoActivoId,
         setMuseoActivoId,
         museoActivo,
+        sensoresActivos,
+        sensorIdsActivos,
         cargando,
         error,
         recargar,

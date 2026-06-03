@@ -7,6 +7,7 @@ import ViewLayout from '../components/ViewLayout.jsx'
 import Sensor360Modal from '../components/Sensor360Modal.jsx'
 import SensorDetalleModal from '../components/SensorDetalleModal.jsx'
 import { sensores as apiSensores, ubicaciones as apiUbicaciones } from '../api/index.js'
+import { useMuseo } from '../context/MuseoContext.jsx'
 
 const aLista = (r) => (Array.isArray(r) ? r : r?.data ?? [])
 
@@ -45,6 +46,7 @@ export default function SensoresView() {
   const [sensorActivo, setSensorActivo] = useState(null) // sensor del modal 360
   const [sensorDetalle, setSensorDetalle] = useState(null) // sensor del modal detalle
   const [salaSel, setSalaSel] = useState('todas') // filtro de sala activo en el dropdown
+  const { sensorIdsActivos, museoActivo } = useMuseo() // museo del selector global
 
   const cargar = async () => {
     setEstado('cargando')
@@ -81,39 +83,36 @@ export default function SensoresView() {
   const nombreUbicacion = (s) =>
     ubicacionPorRef[s.referencia] ?? (s.ubicacion_id != null ? `Ubicación ${s.ubicacion_id}` : '—')
 
-  const activos = sensores.filter((s) => (s.estado || '').toLowerCase().includes('activ')).length
-  const numUbicaciones = new Set(sensores.map((s) => nombreUbicacion(s))).size
+  // Solo los sensores del museo seleccionado en el selector global.
+  const sensoresDelMuseo = sensores.filter((s) => sensorIdsActivos.has(String(s.id)))
 
-  // Salas únicas para el dropdown. Se derivan de los propios sensores: si el back
-  // ya devuelve ubicacion_sql.museo embebido, mostramos también el museo; si no,
-  // caemos al nombre resuelto por el mapa de referencias (compatibilidad).
+  const activos = sensoresDelMuseo.filter((s) => (s.estado || '').toLowerCase().includes('activ')).length
+  const numUbicaciones = new Set(sensoresDelMuseo.map((s) => nombreUbicacion(s))).size
+
+  // Salas únicas para el dropdown, derivadas de los sensores del museo activo.
   const salas = [
     ...new Map(
-      sensores
+      sensoresDelMuseo
         .filter((s) => s.ubicacion_id != null)
         .map((s) => [
           String(s.ubicacion_id),
-          {
-            id: s.ubicacion_id,
-            nombre: nombreUbicacion(s),
-            museo: s.ubicacion_sql?.museo?.nombre ?? null,
-          },
+          { id: s.ubicacion_id, nombre: nombreUbicacion(s) },
         ])
     ).values(),
   ]
 
-  // Sensores tras aplicar el filtro de sala del dropdown
+  // Sensores del museo tras aplicar además el filtro de sala del dropdown.
   const sensoresFiltrados =
     salaSel === 'todas'
-      ? sensores
-      : sensores.filter((s) => String(s.ubicacion_id) === String(salaSel))
+      ? sensoresDelMuseo
+      : sensoresDelMuseo.filter((s) => String(s.ubicacion_id) === String(salaSel))
 
   return (
     <ViewLayout titulo="Sensores" subtitulo="Datos en vivo · GET /api/sensores">
-      {/* Tira de métricas */}
-      {estado === 'ok' && sensores.length > 0 && (
+      {/* Tira de métricas (del museo seleccionado) */}
+      {estado === 'ok' && sensoresDelMuseo.length > 0 && (
         <div className="grid grid-cols-3 gap-4 mb-5">
-          <Metrica etiqueta="Sensores" valor={sensores.length} />
+          <Metrica etiqueta="Sensores" valor={sensoresDelMuseo.length} />
           <Metrica etiqueta="Activos" valor={activos} color="text-green-400" />
           <Metrica etiqueta="Ubicaciones" valor={numUbicaciones} />
         </div>
@@ -124,7 +123,9 @@ export default function SensoresView() {
           <div>
             <h2 className="font-semibold text-white">Listado de sensores</h2>
             <p className="text-sm text-slate-400">
-              {estado === 'ok' ? `${sensores.length} sensores recibidos del back` : 'Conectando con el back…'}
+              {estado === 'ok'
+                ? `${sensoresDelMuseo.length} sensores · ${museoActivo?.nombre ?? '—'}`
+                : 'Conectando con el back…'}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -165,13 +166,13 @@ export default function SensoresView() {
           </div>
         )}
 
-        {estado === 'ok' && sensores.length === 0 && (
+        {estado === 'ok' && sensoresDelMuseo.length === 0 && (
           <p className="px-6 py-8 text-center text-slate-400 text-sm">
-            Conexión OK, pero no hay sensores. Siembra datos en el back (SensorSeeder).
+            No hay sensores para {museoActivo?.nombre ?? 'este museo'}.
           </p>
         )}
 
-        {estado === 'ok' && sensores.length > 0 && (
+        {estado === 'ok' && sensoresDelMuseo.length > 0 && (
           <table className="w-full">
             <thead>
               <tr className="border-b border-white/5">
