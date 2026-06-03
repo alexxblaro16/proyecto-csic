@@ -1,91 +1,8 @@
-// Vista Museo — Sprint 1: layout y estructura, sin funcionalidad
-// Rama: andrea
+// Vista de Museos (dashboard por museo). Datos SOLO reales del back.
+// Componentes de render basados en la rama andrea.
 
-import { useState } from 'react'
-
-const MUSEOS_DATOS = {
-  1: {
-    nombre: 'Materioteca UDIT',
-    humedad: '43,9 %',
-    temperatura: '21,5° C',
-    phPromedio: 6.94,
-    ultimaActualizacion: '05/02/2026 · 14:32',
-    sensores: [
-      { id: 1, nombre: 'Vitrina 1', sala: 'Sala Antigua',    ph: 7.02, estado: 'ÓPTIMO',  ultimaLectura: '14:32' },
-      { id: 2, nombre: 'Vitrina 2', sala: 'Sala Antigua',    ph: 6.95, estado: 'ÓPTIMO',  ultimaLectura: '14:31' },
-      { id: 3, nombre: 'Vitrina 3', sala: 'Sala Central',    ph: 7.18, estado: 'ÓPTIMO',  ultimaLectura: '14:32' },
-      { id: 4, nombre: 'Vitrina 4', sala: 'Sala Central',    ph: 6.88, estado: 'ÓPTIMO',  ultimaLectura: '14:30' },
-      { id: 5, nombre: 'Vitrina 5', sala: 'Archivo Técnico', ph: 7.31, estado: 'ÓPTIMO',  ultimaLectura: '14:32' },
-      { id: 6, nombre: 'Vitrina 6', sala: 'Archivo Técnico', ph: 7.07, estado: 'ÓPTIMO',  ultimaLectura: '14:31' },
-      { id: 7, nombre: 'Vitrina 7', sala: 'Depósito',        ph: 6.76, estado: 'ÓPTIMO',  ultimaLectura: '14:32' },
-      { id: 8, nombre: 'Vitrina 8', sala: 'Depósito',        ph: 6.48, estado: 'ACÍDICO', ultimaLectura: '14:29' },
-      { id: 9, nombre: 'Vitrina 9', sala: 'Almacén B',       ph: 6.39, estado: 'ACÍDICO', ultimaLectura: '14:28' },
-    ],
-    notas: [
-      { id: 1, texto: 'Vitrina 8 y 9 fuera de rango — pH por debajo de 6,5. Revisar sellado con urgencia.', tipo: 'urgente', fecha: '05/02/2026' },
-      { id: 2, texto: 'Próxima medición programada: 15/03/2026. Coordinar con técnico de planta.', tipo: 'info', fecha: '05/02/2026' },
-      { id: 3, texto: 'Humedad estable en todos los materiales durante la última semana.', tipo: 'normal', fecha: '04/02/2026' },
-    ],
-  },
-  2: {
-    nombre: 'Inst. Historia CSIC',
-    humedad: '47,2 %',
-    temperatura: '20,1° C',
-    phPromedio: 7.22,
-    ultimaActualizacion: '05/02/2026 · 13:55',
-    sensores: [
-      { id: 1, nombre: 'Vitrina 1', sala: 'Sala Medieval',   ph: 7.05, estado: 'ÓPTIMO', ultimaLectura: '13:55' },
-      { id: 2, nombre: 'Vitrina 2', sala: 'Sala Medieval',   ph: 6.92, estado: 'ÓPTIMO', ultimaLectura: '13:54' },
-      { id: 3, nombre: 'Vitrina 3', sala: 'Sala Moderna',    ph: 7.44, estado: 'ÓPTIMO', ultimaLectura: '13:55' },
-      { id: 4, nombre: 'Vitrina 4', sala: 'Sala Moderna',    ph: 7.82, estado: 'BÁSICO', ultimaLectura: '13:52' },
-      { id: 5, nombre: 'Vitrina 5', sala: 'Archivo Central', ph: 6.98, estado: 'ÓPTIMO', ultimaLectura: '13:55' },
-      { id: 6, nombre: 'Vitrina 6', sala: 'Depósito Norte',  ph: 7.12, estado: 'ÓPTIMO', ultimaLectura: '13:53' },
-    ],
-    notas: [
-      { id: 1, texto: 'Vitrina 4 (Sala Moderna) con pH elevado: 7,82. Posible contaminación alcalina.', tipo: 'urgente', fecha: '05/02/2026' },
-      { id: 2, texto: 'Revisión programada sala medieval: 12/02/2026.', tipo: 'info', fecha: '04/02/2026' },
-    ],
-  },
-  3: {
-    nombre: 'Museo Arqueológico',
-    humedad: '52,0 %',
-    temperatura: '19,8° C',
-    phPromedio: 6.67,
-    ultimaActualizacion: '05/02/2026 · 12:10',
-    sensores: [
-      { id: 1, nombre: 'Vitrina 1', sala: 'Sala Ibérica', ph: 7.08, estado: 'ÓPTIMO',  ultimaLectura: '12:10' },
-      { id: 2, nombre: 'Vitrina 2', sala: 'Sala Romana',  ph: 6.74, estado: 'ÓPTIMO',  ultimaLectura: '12:09' },
-      { id: 3, nombre: 'Vitrina 3', sala: 'Sala Romana',  ph: 6.51, estado: 'ÓPTIMO',  ultimaLectura: '12:10' },
-      { id: 4, nombre: 'Vitrina 4', sala: 'Almacén',      ph: 6.35, estado: 'ACÍDICO', ultimaLectura: '12:05' },
-    ],
-    notas: [
-      { id: 1, texto: 'Vitrina 4 (Almacén) fuera de rango — pH: 6,35. Revisar con urgencia.', tipo: 'urgente', fecha: '05/02/2026' },
-      { id: 2, texto: 'Alta humedad (52 %). Supervisar condensación en vitrinas de sala romana.', tipo: 'normal', fecha: '04/02/2026' },
-    ],
-  },
-  4: {
-    nombre: 'Fondo Documental',
-    humedad: '41,5 %',
-    temperatura: '22,0° C',
-    phPromedio: 7.02,
-    ultimaActualizacion: '05/02/2026 · 11:45',
-    sensores: [
-      { id: 1, nombre: 'Sensor 1', sala: 'Sala A', ph: 7.15, estado: 'ÓPTIMO', ultimaLectura: '11:45' },
-      { id: 2, nombre: 'Sensor 2', sala: 'Sala A', ph: 7.03, estado: 'ÓPTIMO', ultimaLectura: '11:44' },
-      { id: 3, nombre: 'Sensor 3', sala: 'Sala B', ph: 6.88, estado: 'ÓPTIMO', ultimaLectura: '11:45' },
-    ],
-    notas: [
-      { id: 1, texto: 'Todos los sensores en rango. Revisión trimestral: 20/05/2026.', tipo: 'info', fecha: '05/02/2026' },
-    ],
-  },
-}
-
-const museosMock = [
-  { id: 1, nombre: 'Materioteca UDIT' },
-  { id: 2, nombre: 'Inst. Historia CSIC' },
-  { id: 3, nombre: 'Museo Arqueológico' },
-  { id: 4, nombre: 'Fondo Documental' },
-]
+import { useState, useEffect, useRef } from 'react'
+import { cargarDashboard } from '../api/dashboard.js'
 
 const ESTADO_CLASES = {
   ÓPTIMO:  { badge: 'bg-green-400/10 text-green-300 border-green-400/20',   punto: 'bg-green-400'  },
@@ -105,100 +22,189 @@ function claseEstado(estado) {
 
 // ── Raíz ──────────────────────────────────────────────────────────────────────
 
+// Vista de Museos (dashboard). Se renderiza dentro del AppLayout (que ya aporta
+// la sidebar global), por eso aquí solo va Header + selector de museo + contenido.
 export default function MuseumView() {
-  const [museoActivoId, setMuseoActivoId] = useState(1)
-  const museo = MUSEOS_DATOS[museoActivoId]
+  const [datos, setDatos] = useState(null)
+  const [lista, setLista] = useState([])
+  const [museoActivoId, setMuseoActivoId] = useState(null)
+  const [cargando, setCargando] = useState(true)
+  const [error, setError] = useState(false)
+
+  useEffect(() => {
+    let activo = true
+    cargarDashboard()
+      .then((res) => {
+        if (!activo) return
+        if (res && res.lista.length) {
+          setDatos(res.datos)
+          setLista(res.lista)
+          setMuseoActivoId(res.lista[0].id)
+        }
+      })
+      .catch(() => {
+        if (activo) setError(true)
+      })
+      .finally(() => {
+        if (activo) setCargando(false)
+      })
+    return () => {
+      activo = false
+    }
+  }, [])
+
+  if (cargando) return <DashboardCargando />
+  // Solo datos reales: si el back no responde o no hay museos, estado vacío (sin demo).
+  if (error || !datos || !lista.length) return <DashboardVacio error={error} />
+
+  const museo = datos[museoActivoId] ?? Object.values(datos)[0]
 
   return (
-    <div className="flex h-screen bg-slate-950 text-white overflow-hidden">
-      <Sidebar museoActivoId={museoActivoId} onSelectMuseo={setMuseoActivoId} />
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Header museo={museo} />
+    <>
+      <Header museo={museo} />
+      <div className="flex-1 overflow-y-auto bg-[#0f1117]">
+        <div className="px-6 pt-6">
+          <SelectorMuseos lista={lista} datos={datos} activoId={museoActivoId} onSelect={setMuseoActivoId} />
+        </div>
         <ContenidoPrincipal museo={museo} key={museoActivoId} />
       </div>
-    </div>
+    </>
   )
 }
 
-// ── Sidebar ───────────────────────────────────────────────────────────────────
+// ── Estado vacío / error ────────────────────────────────────────────────────
 
-function Sidebar({ museoActivoId, onSelectMuseo }) {
+function DashboardVacio({ error }) {
   return (
-    <aside className="w-64 flex-shrink-0 flex flex-col border-r border-white/5 bg-slate-950">
-      <div className="p-5 border-b border-white/5">
-        <LogoApp />
-      </div>
-
-      <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-        <ElementoNav label="Museos" activo />
-        <ElementoNav label="Sensores" />
-        <ElementoNav label="Analítica" />
-        <ElementoNav label="Alertas" />
-
-        <div className="pt-5">
-          <p className="text-xs text-slate-500 uppercase tracking-widest px-3 mb-1">Inventario</p>
-          {museosMock.map(m => {
-            const datos      = MUSEOS_DATOS[m.id]
-            const alertCount = datos.sensores.filter(s => s.estado !== 'ÓPTIMO').length
-            return (
-              <button
-                key={m.id}
-                onClick={() => onSelectMuseo(m.id)}
-                className={`w-full text-left px-3 py-2.5 text-sm rounded-lg transition flex items-center justify-between ${
-                  museoActivoId === m.id
-                    ? 'bg-white/10 text-white font-medium'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <span className="truncate">{m.nombre}</span>
-                {alertCount > 0 && (
-                  <span className="ml-2 flex-shrink-0 text-xs bg-orange-400/15 text-orange-300 rounded-full px-1.5 py-0.5 font-medium">
-                    {alertCount}
-                  </span>
-                )}
-              </button>
-            )
-          })}
+    <>
+      <header className="h-14 border-b border-white/5 flex items-center px-6 bg-slate-950 flex-shrink-0">
+        <span className="text-sm font-semibold text-white">Museos</span>
+      </header>
+      <div className="flex-1 flex items-center justify-center bg-[#0f1117]">
+        <div className="text-center max-w-sm">
+          <p className="text-slate-300 font-medium">
+            {error ? 'No se pudo conectar con el back' : 'No hay museos con datos'}
+          </p>
+          <p className="text-sm text-slate-500 mt-2">
+            {error
+              ? 'Comprueba que la API esté levantada en localhost:8180 (docker compose up).'
+              : 'Cuando el back tenga museos y sensores, aparecerán aquí.'}
+          </p>
         </div>
-      </nav>
+      </div>
+    </>
+  )
+}
 
-      <div className="p-3 border-t border-white/5 space-y-0.5">
-        <button className="w-full bg-cyan-400 text-slate-950 text-sm font-semibold py-2 rounded-lg hover:bg-cyan-300 transition mb-2">
-          + Añadir museo
+// ── Estado de carga ───────────────────────────────────────────────────────────
+
+function DashboardCargando() {
+  return (
+    <>
+      <header className="h-14 border-b border-white/5 flex items-center px-6 bg-slate-950 flex-shrink-0">
+        <span className="text-sm font-semibold text-white">Museos</span>
+      </header>
+      <div className="flex-1 flex items-center justify-center bg-[#0f1117]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-2 border-cyan-400/30 border-t-cyan-400 animate-spin" />
+          <p className="text-slate-400 text-sm">Cargando museos…</p>
+        </div>
+      </div>
+    </>
+  )
+}
+
+// ── Selector de museo (dropdown personalizado) ──────────────────────────────
+// Desplegable propio (no <select> nativo, que se ve mal en tema oscuro):
+// totalmente estilizado, con buscador-lista, alertas por museo y cierre al
+// hacer clic fuera o pulsar Escape.
+
+function SelectorMuseos({ lista, datos, activoId, onSelect }) {
+  const [abierto, setAbierto] = useState(false)
+  const ref = useRef(null)
+  const museo = datos[activoId]
+  const alertasDe = (id) =>
+    datos[id]?.sensores?.filter((s) => s.estado !== 'ÓPTIMO' && s.estado !== 'SIN DATOS').length ?? 0
+  const alertCount = alertasDe(activoId)
+
+  useEffect(() => {
+    const fuera = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setAbierto(false)
+    }
+    const esc = (e) => {
+      if (e.key === 'Escape') setAbierto(false)
+    }
+    document.addEventListener('mousedown', fuera)
+    document.addEventListener('keydown', esc)
+    return () => {
+      document.removeEventListener('mousedown', fuera)
+      document.removeEventListener('keydown', esc)
+    }
+  }, [])
+
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <span className="text-xs text-slate-500 uppercase tracking-widest">Museo</span>
+
+      <div className="relative" ref={ref}>
+        <button
+          type="button"
+          onClick={() => setAbierto((o) => !o)}
+          className="flex items-center justify-between gap-3 min-w-[220px] rounded-xl border border-white/10 bg-slate-900 pl-4 pr-3 py-2 text-sm text-white hover:bg-white/5 focus:border-cyan-400/50 outline-none transition"
+        >
+          <span className="truncate">{museo?.nombre ?? 'Selecciona un museo'}</span>
+          <span className={`text-slate-400 text-xs transition-transform ${abierto ? 'rotate-180' : ''}`}>▾</span>
         </button>
-        <ElementoNav label="Configuración" />
-        <ElementoNav label="Soporte" />
-      </div>
-    </aside>
-  )
-}
 
-function LogoApp() {
-  return (
-    <div className="flex items-center gap-2.5">
-      <div className="w-9 h-9 rounded-lg bg-cyan-400/10 border border-cyan-400/30 flex items-center justify-center flex-shrink-0">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <circle cx="9" cy="9" r="7.5" stroke="#22d3ee" strokeWidth="1.2" />
-          <text x="9" y="13" textAnchor="middle" fontSize="7" fontWeight="700" fill="#22d3ee" fontFamily="monospace">pH</text>
-        </svg>
+        {abierto && (
+          <div className="absolute left-0 z-30 mt-2 w-72 max-h-80 overflow-y-auto rounded-xl border border-white/10 bg-slate-900 p-1 shadow-2xl shadow-slate-950/60">
+            {lista.map((m) => {
+              const activo = String(activoId) === String(m.id)
+              const alertas = alertasDe(m.id)
+              return (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => {
+                    onSelect(m.id)
+                    setAbierto(false)
+                  }}
+                  className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm text-left transition ${
+                    activo
+                      ? 'bg-cyan-400/10 text-cyan-200 font-medium'
+                      : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                  }`}
+                >
+                  <span className="truncate">{m.nombre}</span>
+                  {alertas > 0 && (
+                    <span className="flex-shrink-0 text-xs bg-orange-400/15 text-orange-300 rounded-full px-1.5 py-0.5 font-medium">
+                      {alertas}
+                    </span>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
-      <div>
-        <p className="text-sm font-bold text-white leading-tight">VirtualpH</p>
-        <p className="text-xs text-slate-400 leading-tight">Monitor CSIC</p>
-      </div>
+
+      {museo?.ciudad && (
+        <span className="text-sm text-slate-400">
+          {museo.ciudad}
+          {museo.pais ? `, ${museo.pais}` : ''}
+        </span>
+      )}
+
+      {alertCount > 0 && (
+        <span className="text-xs bg-orange-400/15 text-orange-300 rounded-full px-2 py-0.5 font-medium">
+          {alertCount} alerta{alertCount > 1 ? 's' : ''}
+        </span>
+      )}
+
+      <span className="ml-auto text-xs rounded-full px-2 py-0.5 border border-green-400/30 bg-green-400/10 text-green-300">
+        ● en vivo
+      </span>
     </div>
-  )
-}
-
-function ElementoNav({ label, activo }) {
-  return (
-    <button
-      className={`w-full text-left px-3 py-2.5 text-sm rounded-lg transition ${
-        activo ? 'bg-white/10 text-white font-medium' : 'text-slate-300 hover:text-white hover:bg-white/5'
-      }`}
-    >
-      {label}
-    </button>
   )
 }
 
@@ -240,7 +246,6 @@ function ContenidoPrincipal({ museo }) {
     : '100,0'
 
   return (
-    <div className="flex-1 overflow-y-auto bg-[#0f1117]">
       <div className="p-6 space-y-5">
 
         <div className="flex items-end justify-between">
@@ -288,7 +293,6 @@ function ContenidoPrincipal({ museo }) {
         </div>
 
       </div>
-    </div>
   )
 }
 
@@ -296,7 +300,7 @@ function ContenidoPrincipal({ museo }) {
 
 function BannerAlertas({ alertas }) {
   return (
-    <div className="rounded-xl border border-orange-400/20 bg-orange-400/5 p-4 flex items-start gap-3">
+    <div className="rounded-2xl border border-orange-400/20 bg-orange-400/5 p-4 flex items-start gap-3">
       <div className="w-8 h-8 rounded-lg bg-orange-400/10 flex items-center justify-center flex-shrink-0 mt-0.5">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path d="M8 2L14 13H2L8 2Z" stroke="#fb923c" strokeWidth="1.3" strokeLinejoin="round" />
@@ -325,7 +329,7 @@ function BannerAlertas({ alertas }) {
 
 function TarjetaMetrica({ etiqueta, valor, sub, colorSub, bordeAlerta }) {
   return (
-    <div className={`rounded-xl border bg-slate-900 p-5 ${bordeAlerta ? 'border-orange-400/20' : 'border-white/10'}`}>
+    <div className={`rounded-2xl border bg-slate-900 p-5 ${bordeAlerta ? 'border-orange-400/20' : 'border-white/10'}`}>
       <p className="text-sm text-slate-400 uppercase tracking-widest mb-3">{etiqueta}</p>
       <p className="text-3xl font-bold text-white">{valor}</p>
       {sub && <p className={`text-sm mt-2 ${colorSub}`}>{sub}</p>}
@@ -335,7 +339,7 @@ function TarjetaMetrica({ etiqueta, valor, sub, colorSub, bordeAlerta }) {
 
 function TarjetaAtmosferica({ museo }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-slate-900 p-5">
+    <div className="rounded-2xl border border-white/10 bg-slate-900 p-5">
       <p className="text-sm text-slate-400 uppercase tracking-widest mb-3">Condiciones</p>
       <div className="grid grid-cols-2 gap-3">
         <div>
@@ -355,7 +359,7 @@ function TarjetaAtmosferica({ museo }) {
 
 function TablaSensores({ sensores, nombreMuseo }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-slate-900 overflow-hidden">
+    <div className="rounded-2xl border border-white/10 bg-slate-900 overflow-hidden">
       <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
         <h2 className="font-semibold text-white">Tabla de sensores</h2>
         <span className="text-sm text-slate-400">{sensores.length} sensores</span>
@@ -447,7 +451,7 @@ function BarraPH({ ph, estado, ancho = 'w-24' }) {
 
 function PanelNotas({ notas, nombreMuseo }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-slate-900 flex flex-col">
+    <div className="rounded-2xl border border-white/10 bg-slate-900 flex flex-col">
       <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
         <div>
           <h2 className="font-semibold text-white">Notas</h2>

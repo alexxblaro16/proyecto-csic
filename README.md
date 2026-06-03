@@ -63,6 +63,8 @@ Herramientas por necesidad:
 
 ## Puesta en marcha rápida
 
+> 💡 Guía detallada para arrancar el **front + back** paso a paso (con login de prueba y solución de problemas comunes): [`desktop/README.md`](./desktop/README.md).
+
 ### Primer día
 
 1. Clonar el repositorio con .
@@ -260,6 +262,7 @@ El repositorio ya incluye reglas para evitar la mayoría de estos casos, pero ca
 
 ## Documentación adicional
 
+- [Guía de arranque del front (desktop)](./desktop/README.md)
 - [Guía de contribución](./CONTRIBUTING.md)
 - [Arquitectura](./docs/arquitectura.md)
 - [Setup local](./docs/setup-local.md)

@@ -41,6 +41,11 @@ Route::get('/test-mongodb', function () {
     }
 }); */
 
+// Autenticación
+// Ivan: rutas de login/logout anadidas por Alejandro (front) para que el login
+// del desktop funcione. Si las asumes tu como back, son todas tuyas.
+Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
+
 // Rutas públicas (sin autenticación)
 Route::apiResource('usuarios', App\Http\Controllers\UserController::class);
 Route::apiResource('museos', App\Http\Controllers\MuseoController::class);
@@ -56,7 +61,8 @@ Route::get('/imagenes/ubicacion/{ubicacion_id}', [App\Http\Controllers\ImagenCon
 
 // Rutas protegidas (con autenticación)
 Route::middleware('auth:sanctum')->group(function () {
-    
+    Route::get('/me', [App\Http\Controllers\AuthController::class, 'me']);
+    Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
 });
 
 
