@@ -5,6 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\UbicacionImagen;
 use Illuminate\Http\Request;
 
+/**
+ * Controlador de UBICACIONES DOCUMENTALES DE IMÁGENES (MongoDB).
+ *
+ * Gestiona el modelo UbicacionImagen (MongoDB, colección 'ubicaciones'): agrupa
+ * imágenes y referencia sensores por su 'referencia'. Es el dominio de fotos.
+ * Ruta: /api/ubicaciones-imagenes
+ *
+ * NO confundir con UbicacionController, que gestiona la ubicación física SQL
+ * de los sensores (/api/ubicaciones).
+ */
 class UbicacionImagenController extends Controller
 {
     public function index()

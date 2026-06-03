@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
-use App\Models\Product;
 use App\Models\Museo;
 
 /* Route::get('/health', function () {

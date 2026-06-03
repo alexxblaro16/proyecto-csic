@@ -5,6 +5,16 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\UbicacionSql;
 
+/**
+ * Controlador de UBICACIONES FÍSICAS (SQL).
+ *
+ * Gestiona el modelo UbicacionSql (MySQL, tabla 'ubicaciones'): la ubicación
+ * física donde viven los sensores, asociada a un museo por museo_id.
+ * Ruta: /api/ubicaciones
+ *
+ * NO confundir con UbicacionImagenController, que gestiona la ubicación
+ * documental de imágenes en MongoDB (/api/ubicaciones-imagenes).
+ */
 class UbicacionController extends Controller
 {
     /**
