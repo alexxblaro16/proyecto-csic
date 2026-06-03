@@ -1,8 +1,7 @@
 // Vista de Museos (dashboard por museo). Datos SOLO reales del back.
 // Componentes de render basados en la rama andrea.
 
-import { useState, useEffect, useRef } from 'react'
-import { cargarDashboard } from '../api/dashboard.js'
+import { useMuseo } from '../context/MuseoContext.jsx'
 
 const ESTADO_CLASES = {
   ÓPTIMO:  { badge: 'bg-green-400/10 text-green-300 border-green-400/20',   punto: 'bg-green-400'  },
@@ -25,47 +24,20 @@ function claseEstado(estado) {
 // Vista de Museos (dashboard). Se renderiza dentro del AppLayout (que ya aporta
 // la sidebar global), por eso aquí solo va Header + selector de museo + contenido.
 export default function MuseumView() {
-  const [datos, setDatos] = useState(null)
-  const [lista, setLista] = useState([])
-  const [museoActivoId, setMuseoActivoId] = useState(null)
-  const [cargando, setCargando] = useState(true)
-  const [error, setError] = useState(false)
-
-  useEffect(() => {
-    let activo = true
-    cargarDashboard()
-      .then((res) => {
-        if (!activo) return
-        if (res && res.lista.length) {
-          setDatos(res.datos)
-          setLista(res.lista)
-          setMuseoActivoId(res.lista[0].id)
-        }
-      })
-      .catch(() => {
-        if (activo) setError(true)
-      })
-      .finally(() => {
-        if (activo) setCargando(false)
-      })
-    return () => {
-      activo = false
-    }
-  }, [])
+  // El museo activo y sus datos vienen del selector global (MuseoContext);
+  // esta vista ya no carga datos ni tiene su propio selector.
+  const { museoActivo, museoActivoId, cargando, error } = useMuseo()
 
   if (cargando) return <DashboardCargando />
   // Solo datos reales: si el back no responde o no hay museos, estado vacío (sin demo).
-  if (error || !datos || !lista.length) return <DashboardVacio error={error} />
+  if (error || !museoActivo) return <DashboardVacio error={error} />
 
-  const museo = datos[museoActivoId] ?? Object.values(datos)[0]
+  const museo = museoActivo
 
   return (
     <>
       <Header museo={museo} />
       <div className="flex-1 overflow-y-auto bg-[#0f1117]">
-        <div className="px-6 pt-6">
-          <SelectorMuseos lista={lista} datos={datos} activoId={museoActivoId} onSelect={setMuseoActivoId} />
-        </div>
         <ContenidoPrincipal museo={museo} key={museoActivoId} />
       </div>
     </>
@@ -114,99 +86,9 @@ function DashboardCargando() {
   )
 }
 
-// ── Selector de museo (dropdown personalizado) ──────────────────────────────
-// Desplegable propio (no <select> nativo, que se ve mal en tema oscuro):
-// totalmente estilizado, con buscador-lista, alertas por museo y cierre al
-// hacer clic fuera o pulsar Escape.
-
-function SelectorMuseos({ lista, datos, activoId, onSelect }) {
-  const [abierto, setAbierto] = useState(false)
-  const ref = useRef(null)
-  const museo = datos[activoId]
-  const alertasDe = (id) =>
-    datos[id]?.sensores?.filter((s) => s.estado !== 'ÓPTIMO' && s.estado !== 'SIN DATOS').length ?? 0
-  const alertCount = alertasDe(activoId)
-
-  useEffect(() => {
-    const fuera = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setAbierto(false)
-    }
-    const esc = (e) => {
-      if (e.key === 'Escape') setAbierto(false)
-    }
-    document.addEventListener('mousedown', fuera)
-    document.addEventListener('keydown', esc)
-    return () => {
-      document.removeEventListener('mousedown', fuera)
-      document.removeEventListener('keydown', esc)
-    }
-  }, [])
-
-  return (
-    <div className="flex flex-wrap items-center gap-3">
-      <span className="text-xs text-slate-500 uppercase tracking-widest">Museo</span>
-
-      <div className="relative" ref={ref}>
-        <button
-          type="button"
-          onClick={() => setAbierto((o) => !o)}
-          className="flex items-center justify-between gap-3 min-w-[220px] rounded-xl border border-white/10 bg-slate-900 pl-4 pr-3 py-2 text-sm text-white hover:bg-white/5 focus:border-cyan-400/50 outline-none transition"
-        >
-          <span className="truncate">{museo?.nombre ?? 'Selecciona un museo'}</span>
-          <span className={`text-slate-400 text-xs transition-transform ${abierto ? 'rotate-180' : ''}`}>▾</span>
-        </button>
-
-        {abierto && (
-          <div className="absolute left-0 z-30 mt-2 w-72 max-h-80 overflow-y-auto rounded-xl border border-white/10 bg-slate-900 p-1 shadow-2xl shadow-slate-950/60">
-            {lista.map((m) => {
-              const activo = String(activoId) === String(m.id)
-              const alertas = alertasDe(m.id)
-              return (
-                <button
-                  key={m.id}
-                  type="button"
-                  onClick={() => {
-                    onSelect(m.id)
-                    setAbierto(false)
-                  }}
-                  className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm text-left transition ${
-                    activo
-                      ? 'bg-cyan-400/10 text-cyan-200 font-medium'
-                      : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                  }`}
-                >
-                  <span className="truncate">{m.nombre}</span>
-                  {alertas > 0 && (
-                    <span className="flex-shrink-0 text-xs bg-orange-400/15 text-orange-300 rounded-full px-1.5 py-0.5 font-medium">
-                      {alertas}
-                    </span>
-                  )}
-                </button>
-              )
-            })}
-          </div>
-        )}
-      </div>
-
-      {museo?.ciudad && (
-        <span className="text-sm text-slate-400">
-          {museo.ciudad}
-          {museo.pais ? `, ${museo.pais}` : ''}
-        </span>
-      )}
-
-      {alertCount > 0 && (
-        <span className="text-xs bg-orange-400/15 text-orange-300 rounded-full px-2 py-0.5 font-medium">
-          {alertCount} alerta{alertCount > 1 ? 's' : ''}
-        </span>
-      )}
-
-      <span className="ml-auto text-xs rounded-full px-2 py-0.5 border border-green-400/30 bg-green-400/10 text-green-300">
-        ● en vivo
-      </span>
-    </div>
-  )
-}
+// El selector de museo ahora es global y vive en components/SelectorMuseoGlobal.jsx
+// (montado en la barra superior del AppLayout). Esta vista solo consume el museo
+// activo desde el MuseoContext.
 
 // ── Header ────────────────────────────────────────────────────────────────────
 
