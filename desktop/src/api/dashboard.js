@@ -58,6 +58,12 @@ export async function cargarDashboard() {
   for (const mu of museosL) {
     const tokens = tokensMuseo(mu.nombre)
     const propios = sens.filter((s) => {
+      // Asociación REAL (relación del back de Iván): sensor.ubicacion_sql.museo.id.
+      // Es la fuente fiable y la que permite que un sensor creado a mano aparezca
+      // en su museo aunque la referencia no lleve el nombre del museo.
+      const museoIdReal = s.ubicacion_sql?.museo?.id
+      if (museoIdReal != null) return String(museoIdReal) === String(mu.id)
+      // Fallback para datos antiguos sin la relación cargada: token de la referencia.
       const ref = (s.referencia || '').toUpperCase()
       return tokens.some((t) => ref.includes(t))
     })

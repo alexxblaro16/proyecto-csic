@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import ViewLayout from '../components/ViewLayout.jsx'
 import Sensor360Modal from '../components/Sensor360Modal.jsx'
 import SensorDetalleModal from '../components/SensorDetalleModal.jsx'
+import CrearSensorModal from '../components/CrearSensorModal.jsx'
 import { sensores as apiSensores, ubicaciones as apiUbicaciones } from '../api/index.js'
 import { useMuseo } from '../context/MuseoContext.jsx'
 
@@ -41,12 +42,15 @@ function PinUbicacion() {
 export default function SensoresView() {
   const [sensores, setSensores] = useState([])
   const [ubicacionPorRef, setUbicacionPorRef] = useState({})
+  const [ubicaciones, setUbicaciones] = useState([]) // ubicaciones SQL (para crear sensor)
   const [estado, setEstado] = useState('cargando') // cargando | ok | error
   const [error, setError] = useState('')
   const [sensorActivo, setSensorActivo] = useState(null) // sensor del modal 360
   const [sensorDetalle, setSensorDetalle] = useState(null) // sensor del modal detalle
   const [salaSel, setSalaSel] = useState('todas') // filtro de sala activo en el dropdown
-  const { sensorIdsActivos, museoActivo } = useMuseo() // museo del selector global
+  const [mostrarCrear, setMostrarCrear] = useState(false) // modal de nuevo sensor
+  // museo del selector global + recarga del resumen/selector tras crear datos
+  const { sensorIdsActivos, museoActivo, museoActivoId, recargar: recargarMuseo } = useMuseo()
 
   const cargar = async () => {
     setEstado('cargando')
@@ -69,6 +73,7 @@ export default function SensoresView() {
 
       setSensores(sens)
       setUbicacionPorRef(mapa)
+      setUbicaciones(ubic)
       setEstado('ok')
     } catch (e) {
       setError(e.message)
@@ -79,6 +84,17 @@ export default function SensoresView() {
   useEffect(() => {
     cargar()
   }, [])
+
+  // Ubicaciones del museo activo (para el selector del formulario de nuevo sensor).
+  const ubicacionesDelMuseo = ubicaciones.filter(
+    (u) => String(u.museo_id ?? u.museo?.id) === String(museoActivoId)
+  )
+
+  // Tras crear un sensor: recargamos esta vista y el resumen/selector global.
+  const trasMutar = () => {
+    cargar()
+    recargarMuseo()
+  }
 
   const nombreUbicacion = (s) =>
     ubicacionPorRef[s.referencia] ?? (s.ubicacion_id != null ? `Ubicación ${s.ubicacion_id}` : '—')
@@ -154,6 +170,13 @@ export default function SensoresView() {
                 </option>
               ))}
             </select>
+
+            <button
+              onClick={() => setMostrarCrear(true)}
+              className="rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1.5 text-sm font-semibold text-cyan-300 transition hover:bg-cyan-400/20"
+            >
+              + Nuevo sensor
+            </button>
 
             <button
               onClick={cargar}
@@ -240,6 +263,7 @@ export default function SensoresView() {
           sensor={sensorDetalle}
           ubicacion={nombreUbicacion(sensorDetalle)}
           onClose={() => setSensorDetalle(null)}
+          onMutar={trasMutar}
         />
       )}
 
@@ -249,6 +273,16 @@ export default function SensoresView() {
           sensor={sensorActivo}
           ubicacion={nombreUbicacion(sensorActivo)}
           onClose={() => setSensorActivo(null)}
+        />
+      )}
+
+      {/* Modal de creación de sensor */}
+      {mostrarCrear && (
+        <CrearSensorModal
+          museoNombre={museoActivo?.nombre}
+          ubicaciones={ubicacionesDelMuseo}
+          onClose={() => setMostrarCrear(false)}
+          onCreado={trasMutar}
         />
       )}
     </ViewLayout>
